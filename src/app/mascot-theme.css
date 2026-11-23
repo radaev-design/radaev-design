@@ -1,0 +1,66 @@
+/* Палитра маскота: светлая и тёмная темы. Подключается ПОСЛЕ extra.css и перекрашивает всё. */
+:root {
+  --blue: #5b3cff;
+  --deep: #1b1464;
+  --bg: #f3f1ff;
+  --white: #ffffff;
+  --black: #12103a;
+  --muted: #6f6a9a;
+  --accent: #c84bff;
+  --grad: linear-gradient(135deg, #2f6bff 0%, #7b3cff 55%, #d14bff 100%);
+  --shadow: 0 10px 30px rgba(91, 60, 255, 0.14);
+}
+:root[data-theme='dark'] {
+  --blue: #7b5cff;
+  --deep: #c9b8ff;
+  --bg: #05030f;
+  --white: #120b2e;
+  --black: #f3f0ff;
+  --muted: #a49fd0;
+  --accent: #d14bff;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(123, 92, 255, 0.14);
+}
+
+/* Кнопки, вкладки, чипы */
+.btn { background: var(--grad); box-shadow: 0 8px 22px rgba(123, 60, 255, 0.4); }
+.btn.secondary { background: var(--white); color: var(--blue); box-shadow: var(--shadow); }
+.tab.on { background: var(--grad); }
+.chip.on { background: var(--grad); }
+.badge.pop { background: #ece8ff; color: var(--blue); }
+.avatar { background-color: var(--blue); }
+
+/* Hero и 3D-объекты */
+.hero {
+  background: radial-gradient(circle at 85% 8%, #ff7af0 0%, #7b3cff 38%, #2f6bff 72%, #1b1464 100%);
+  box-shadow: 0 20px 40px rgba(123, 60, 255, 0.35);
+}
+.sphere, .sp-orb.o1 { background: radial-gradient(circle at 30% 28%, #d8f3ff, #3cc8ff 50%, #2f6bff); }
+
+/* Истории */
+.st-ring:not(.seen) { background: conic-gradient(#3cc8ff, #7b3cff, #ff7af0, #3cc8ff); }
+.st-av { background-color: var(--blue); }
+
+/* Заставка */
+.splash { background: radial-gradient(circle at 50% 35%, #3b1d9a 0%, #120b2e 45%, #05030f 100%); }
+.sp-logo b { color: #ff9cf5; }
+
+/* Тёмная тема */
+[data-theme='dark'] .tabbar { background: rgba(18, 11, 46, 0.88); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(123, 92, 255, 0.2); }
+[data-theme='dark'] .badge.pop { background: #2a1b5e; color: #c9b8ff; }
+[data-theme='dark'] .btn.secondary { background: #1d1244; color: #c9b8ff; }
+[data-theme='dark'] .skeleton { background: linear-gradient(90deg, #1a1140 25%, #2a1b5e 50%, #1a1140 75%); background-size: 200% 100%; }
+[data-theme='dark'] .bn-dots button { background: #3a2a78; }
+[data-theme='dark'] .bn-dots button.on { background: var(--blue); }
+[data-theme='dark'] .logo { color: #fff; }
+
+/* Шапка: безопасная зона Telegram + всегда на виду */
+.app { padding-top: calc(16px + var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px)); }
+.top {
+  position: sticky; top: calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px));
+  z-index: 20; margin: 0 -16px 14px; padding: 10px 16px; background: var(--bg);
+}
+
+/* Истории: на весь экран, нижнее меню скрыто */
+body:has(.sv) .tabbar { display: none; }
+.sv-bars { top: calc(10px + max(env(safe-area-inset-top), var(--tg-safe-area-inset-top, 0px)) + var(--tg-content-safe-area-inset-top, 0px)); }
+.sv-head { top: calc(22px + max(env(safe-area-inset-top), var(--tg-safe-area-inset-top, 0px)) + var(--tg-content-safe-area-inset-top, 0px)); }
