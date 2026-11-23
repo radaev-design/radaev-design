@@ -1,21 +1,33 @@
 import WebApp from '@twa-dev/sdk';
 
-const BG = '#F4F8FC';
+export const inTelegram = () => !!WebApp.initData;
 
 export function initTelegram() {
+  document.documentElement.style.overscrollBehavior = 'none';
+  if (!inTelegram()) return;
   try {
     WebApp.ready();
     WebApp.expand();
-    WebApp.setHeaderColor(BG);
-    WebApp.setBackgroundColor(BG);
-    // Не даём свайпу вниз сворачивать приложение (Bot API 7.7+).
     WebApp.disableVerticalSwipes();
   } catch {
-    /* запуск вне Telegram (браузер) — просто работаем без SDK */
+    /* старый клиент */
   }
 }
 
-document.documentElement.style.overscrollBehavior = 'none';
+export function setTelegramColors(bg: string) {
+  if (!inTelegram()) return;
+  try {
+    WebApp.setHeaderColor(bg as `#${string}`);
+    WebApp.setBackgroundColor(bg as `#${string}`);
+  } catch {
+    /* no-op */
+  }
+}
+
+export function systemTheme(): 'light' | 'dark' {
+  if (inTelegram()) return WebApp.colorScheme === 'dark' ? 'dark' : 'light';
+  return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
 
 export interface TgUser {
   id?: number;
@@ -26,15 +38,10 @@ export interface TgUser {
 
 export function getUser(): TgUser {
   const u = WebApp.initDataUnsafe?.user;
-  return {
-    id: u?.id,
-    firstName: u?.first_name || 'Гость',
-    username: u?.username,
-    photoUrl: u?.photo_url,
-  };
+  return { id: u?.id, firstName: u?.first_name || 'Гость', username: u?.username, photoUrl: u?.photo_url };
 }
 
-// Строка initData для серверной проверки подписи (используется с Этапа 7).
+// Для серверной проверки подписи (этап 7).
 export const getInitData = () => WebApp.initData || '';
 
 export function haptic(style: 'light' | 'medium' = 'light') {
@@ -45,9 +52,12 @@ export function haptic(style: 'light' | 'medium' = 'light') {
   }
 }
 
-export function openTelegramLink(url: string) {
+export function openLink(url: string) {
+  if (!url) return;
   try {
-    if (WebApp.initData) return WebApp.openTelegramLink(url);
+    if (inTelegram()) {
+      return url.includes('t.me/') ? WebApp.openTelegramLink(url) : WebApp.openLink(url);
+    }
   } catch {
     /* fallthrough */
   }
