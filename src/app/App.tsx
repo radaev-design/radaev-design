@@ -10,6 +10,7 @@ import { ProfileScreen } from '../modules/profile/ProfileScreen';
 import { SettingsScreen } from '../modules/profile/SettingsScreen';
 import { CartProvider, useCart } from '../storage/cart';
 import { Splash } from '../ui/Splash';
+import { ToastProvider } from '../ui/Toast';
 import './extra.css';
 import './mascot-theme.css';
 
@@ -105,12 +106,10 @@ function Shell() {
 
   const { ids } = useCart();
 
-  // Применение темы
   useEffect(() => {
     applyTheme(dark);
   }, [dark]);
 
-  // Splash screen
   useEffect(() => {
     const timer = setTimeout(() => {
       setSplash(false);
@@ -119,20 +118,17 @@ function Shell() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Переключение вкладок
   const go = (t: Tab) => {
     setTab(t);
     setSub(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Открытие каталога с выбранной категорией
   const openCatalog = (c?: CategoryId) => {
     setCat(c);
     go('catalog');
   };
 
-  // Переключение темы
   const setTheme = (d: boolean) => {
     setDark(d);
 
@@ -195,7 +191,6 @@ function Shell() {
             onClick={() => go(t.id)}
           >
             {t.icon}
-
             <span>{t.label}</span>
 
             {t.id === 'orders' && ids.length > 0 && (
@@ -213,7 +208,9 @@ function Shell() {
 export function App() {
   return (
     <CartProvider>
-      <Shell />
+      <ToastProvider>
+        <Shell />
+      </ToastProvider>
     </CartProvider>
   );
 }
