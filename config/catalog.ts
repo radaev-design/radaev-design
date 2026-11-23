@@ -1,7 +1,7 @@
 // ЕДИНСТВЕННОЕ место, где владелец меняет услуги, цены, описания и опции.
 // priceFrom: null  ->  «Стоимость рассчитывается индивидуально».
 // active: false    ->  услуга скрыта из каталога.
-
+import { PITCH, PRICES } from './pricing';
 export type CategoryId = 'design' | 'video' | 'ai-photo' | 'telegram';
 
 export interface Category {
