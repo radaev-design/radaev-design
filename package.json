@@ -1,4 +1,5 @@
 {
+  "framer-motion": "^11.11.0"
   "name": "radaev-design",
   "private": true,
   "version": "0.1.0",
