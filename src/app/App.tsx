@@ -1,3 +1,4 @@
+
 import { ReactNode, useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import WebApp from '@twa-dev/sdk';
@@ -13,20 +14,73 @@ import './extra.css';
 import './mascot-theme.css';
 
 type Tab = 'home' | 'catalog' | 'orders' | 'profile';
+
 const svg = (c: ReactNode) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{c}</svg>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    {c}
+  </svg>
 );
+
 const TABS: { id: Tab; label: string; icon: ReactNode }[] = [
-  { id: 'home', label: 'Главная', icon: svg(<path d="M3 11l9-8 9 8v10a1 1 0 01-1 1h-5v-7H9v7H4a1 1 0 01-1-1z" />) },
-  { id: 'catalog', label: 'Услуги', icon: svg(<><rect x="3" y="3" width="7" height="7" rx="2" /><rect x="14" y="3" width="7" height="7" rx="2" /><rect x="3" y="14" width="7" height="7" rx="2" /><rect x="14" y="14" width="7" height="7" rx="2" /></>) },
-  { id: 'orders', label: 'Заказы', icon: svg(<><path d="M6 7h12l1 14H5z" /><path d="M9 7a3 3 0 016 0" /></>) },
-  { id: 'profile', label: 'Профиль', icon: svg(<><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0116 0" /></>) },
+  {
+    id: 'home',
+    label: 'Главная',
+    icon: svg(
+      <path d="M3 11l9-8 9 8v10a1 1 0 01-1 1h-5v-7H9v7H4a1 1 0 01-1-1z" />
+    ),
+  },
+  {
+    id: 'catalog',
+    label: 'Услуги',
+    icon: svg(
+      <>
+        <rect x="3" y="3" width="7" height="7" rx="2" />
+        <rect x="14" y="3" width="7" height="7" rx="2" />
+        <rect x="3" y="14" width="7" height="7" rx="2" />
+        <rect x="14" y="14" width="7" height="7" rx="2" />
+      </>
+    ),
+  },
+  {
+    id: 'orders',
+    label: 'Заказы',
+    icon: svg(
+      <>
+        <path d="M6 7h12l1 14H5z" />
+        <path d="M9 7a3 3 0 016 0" />
+      </>
+    ),
+  },
+  {
+    id: 'profile',
+    label: 'Профиль',
+    icon: svg(
+      <>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 21a8 8 0 0116 0" />
+      </>
+    ),
+  },
 ];
 
 function applyTheme(dark: boolean) {
-  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
   const bg = dark ? '#05030F' : '#F3F1FF';
-  try { WebApp.setHeaderColor(bg as any); WebApp.setBackgroundColor(bg as any); } catch { /* вне Telegram */ }
+
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+
+  try {
+    WebApp.setHeaderColor(bg as any);
+    WebApp.setBackgroundColor(bg as any);
+  } catch {
+    // Telegram API недоступен вне Telegram
+  }
 }
 
 function Shell() {
@@ -34,38 +88,121 @@ function Shell() {
   const [tab, setTab] = useState<Tab>('home');
   const [sub, setSub] = useState<'settings' | null>(null);
   const [cat, setCat] = useState<CategoryId | undefined>();
+
   const [dark, setDark] = useState<boolean>(() => {
     try {
-      const s = localStorage.getItem('theme');
-      if (s) return s === 'dark';
+      const savedTheme = localStorage.getItem('theme');
+
+      if (savedTheme) {
+        return savedTheme === 'dark';
+      }
+
       return WebApp.colorScheme === 'dark';
-    } catch { return false; }
+    } catch {
+      return false;
+    }
   });
+
   const { ids } = useCart();
 
-  useEffect(() => { applyTheme(dark); }, [dark]);
-  useEffect(() => { const t = setTimeout(() => setSplash(false), 2000); return () => clearTimeout(t); }, []);
+  // Применение темы
+  useEffect(() => {
+    applyTheme(dark);
+  }, [dark]);
 
-  const go = (t: Tab) => { setTab(t); setSub(null); window.scrollTo({ top: 0 }); };
-  const openCatalog = (c?: CategoryId) => { setCat(c); go('catalog'); };
-  const setTheme = (d: boolean) => { setDark(d); try { localStorage.setItem('theme', d ? 'dark' : 'light'); } catch { /* no-op */ } };
+  // Splash screen
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSplash(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Переключение вкладок
+  const go = (t: Tab) => {
+    setTab(t);
+    setSub(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Открытие каталога с выбранной категорией
+  const openCatalog = (c?: CategoryId) => {
+    setCat(c);
+    go('catalog');
+  };
+
+  // Переключение темы
+  const setTheme = (d: boolean) => {
+    setDark(d);
+
+    try {
+      localStorage.setItem('theme', d ? 'dark' : 'light');
+    } catch {
+      // localStorage недоступен
+    }
+  };
 
   return (
     <>
-      <AnimatePresence>{splash && <Splash key="splash" />}</AnimatePresence>
+      <AnimatePresence>
+        {splash && <Splash key="splash" />}
+      </AnimatePresence>
+
       <div className="app">
-        {tab === 'home' && <HomeScreen onOpenCatalog={openCatalog} onOpenProfile={() => go('profile')} />}
-        {tab === 'catalog' && <CatalogScreen key={cat ?? 'all'} initial={cat} />}
-        {tab === 'orders' && <OrdersScreen onCatalog={() => openCatalog()} />}
-        {tab === 'profile' && !sub && <ProfileScreen onOrders={() => go('orders')} onSettings={() => setSub('settings')} />}
-        {tab === 'profile' && sub === 'settings' && <SettingsScreen dark={dark} onTheme={setTheme} onBack={() => setSub(null)} />}
+        {tab === 'home' && (
+          <HomeScreen
+            onOpenCatalog={openCatalog}
+            onOpenProfile={() => go('profile')}
+          />
+        )}
+
+        {tab === 'catalog' && (
+          <CatalogScreen
+            key={cat ?? 'all'}
+            initial={cat}
+          />
+        )}
+
+        {tab === 'orders' && (
+          <OrdersScreen
+            onCatalog={() => openCatalog()}
+          />
+        )}
+
+        {tab === 'profile' && !sub && (
+          <ProfileScreen
+            onOrders={() => go('orders')}
+            onSettings={() => setSub('settings')}
+          />
+        )}
+
+        {tab === 'profile' && sub === 'settings' && (
+          <SettingsScreen
+            dark={dark}
+            onTheme={setTheme}
+            onBack={() => setSub(null)}
+          />
+        )}
       </div>
+
       <nav className="tabbar">
         {TABS.map((t) => (
-          <button key={t.id} id={'tab-' + t.id} className={'tab' + (tab === t.id ? ' on' : '')} onClick={() => go(t.id)}>
+          <button
+            key={t.id}
+            id={'tab-' + t.id}
+            className={'tab' + (tab === t.id ? ' on' : '')}
+            onClick={() => go(t.id)}
+          >
             {t.icon}
-            {t.label}
-            {t.id === 'orders' && ids.length > 0 && <span className="tab-badge">{ids.length}</span>}
+
+            <span>{t.label}</span>
+
+            {t.id === 'orders' && ids.length > 0 && (
+              <span className="tab-badge">
+                {ids.length}
+              </span>
+            )}
           </button>
         ))}
       </nav>
@@ -80,4 +217,5 @@ export function App() {
     </CartProvider>
   );
 }
+
 export default App;
