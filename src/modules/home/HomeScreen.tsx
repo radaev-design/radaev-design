@@ -1,7 +1,10 @@
-import { CATEGORIES, CategoryId } from '../../../config/catalog';
+import { activeServices, CATEGORIES, CategoryId } from '../../../config/catalog';
+import { ADVANTAGES, STEPS } from '../../../config/home';
 import { ru } from '../../i18n/ru';
 import { getUser } from '../../integrations/telegram';
 import { Button } from '../../ui/Button';
+import { Mascot } from '../../ui/Mascot';
+import { ServiceCard } from '../catalog/ServiceCard';
 import { Banners } from './Banners';
 import { Stories } from './Stories';
 
@@ -12,6 +15,9 @@ interface Props {
 
 export function HomeScreen({ onOpenCatalog, onOpenProfile }: Props) {
   const user = getUser();
+  const all = activeServices();
+  const popular = all.filter((s) => s.popular && !s.comingSoon);
+  const soon = all.filter((s) => s.comingSoon);
 
   return (
     <div className="screen">
@@ -56,6 +62,56 @@ export function HomeScreen({ onOpenCatalog, onOpenProfile }: Props) {
           </button>
         ))}
       </div>
+
+      {popular.length > 0 && (
+        <>
+          <h2>Популярное</h2>
+          <div className="hscroll">
+            {popular.map((s) => (
+              <ServiceCard key={s.id} s={s} className="svc-h" />
+            ))}
+          </div>
+        </>
+      )}
+
+      <h2>Как мы работаем</h2>
+      <div className="card steps">
+        {STEPS.map((x, i) => (
+          <div key={x.t} className="step">
+            <span className="step-n">{i + 1}</span>
+            <div>
+              <b>{x.t}</b>
+              <p>{x.d}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <h2>Почему мы</h2>
+      <div className="grid2">
+        {ADVANTAGES.map((a) => (
+          <div key={a.t} className="card adv">
+            <span>{a.ico}</span>
+            <b>{a.t}</b>
+            <p>{a.d}</p>
+          </div>
+        ))}
+      </div>
+
+      {soon.length > 0 && (
+        <>
+          <div className="soon-head">
+            <Mascot pose="coin" size={64} />
+            <div>
+              <h2>Скоро</h2>
+              <p className="muted">Оформите предзаказ первыми</p>
+            </div>
+          </div>
+          {soon.map((s) => (
+            <ServiceCard key={s.id} s={s} />
+          ))}
+        </>
+      )}
     </div>
   );
 }
