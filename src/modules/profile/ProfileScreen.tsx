@@ -1,24 +1,42 @@
 import { BRAND } from '../../../config/catalog';
-import { ru } from '../../i18n/ru';
-import { getUser, openTelegramLink } from '../../integrations/telegram';
+import { LINKS } from '../../../config/links';
+import { getUser } from '../../integrations/telegram';
+import { useCart } from '../../storage/cart';
+import { openLink } from '../../ui/utils';
 
-export function ProfileScreen() {
-  const user = getUser();
+interface Props { onOrders: () => void; onSettings: () => void }
+
+export function ProfileScreen({ onOrders, onSettings }: Props) {
+  const u = getUser();
+  const { ids } = useCart();
+  const share = `https://t.me/share/url?url=${encodeURIComponent('https://t.me/' + BRAND.clientBot)}&text=${encodeURIComponent('Студия RADAEV.DESIGN: дизайн, видео, AI-фото и Telegram-боты')}`;
+  const items: { ico: string; t: string; s?: string; on: () => void }[] = [
+    { ico: '🛍️', t: 'Мои заказы', s: ids.length ? `Выбрано: ${ids.length}` : undefined, on: onOrders },
+    ...(LINKS.channel ? [{ ico: '📣', t: 'Канал студии', on: () => openLink(LINKS.channel) }] : []),
+    ...(LINKS.portfolio ? [{ ico: '🎨', t: 'Портфолио', on: () => openLink(LINKS.portfolio) }] : []),
+    ...(LINKS.reviews ? [{ ico: '⭐', t: 'Отзывы', on: () => openLink(LINKS.reviews) }] : []),
+    { ico: '💬', t: 'Написать менеджеру', on: () => openLink(BRAND.managerUrl) },
+    { ico: '🎁', t: 'Пригласить друга', on: () => openLink(share) },
+    { ico: '⚙️', t: 'Настройки', on: onSettings },
+  ];
   return (
     <div className="screen">
-      <h1>{ru.profile.title}</h1>
-      <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
-        <div className="avatar" style={user.photoUrl ? { backgroundImage: `url(${user.photoUrl})` } : undefined}>
-          {user.photoUrl ? '' : user.firstName[0]}
-        </div>
+      <div className="card pf">
+        <div className="avatar big" style={u.photoUrl ? { backgroundImage: `url(${u.photoUrl})` } : undefined}>{u.photoUrl ? '' : u.firstName[0]}</div>
         <div>
-          <b>{user.firstName}</b>
-          <div className="hello">{user.username ? '@' + user.username : ru.profile.noUsername}</div>
+          <h3>{u.firstName}</h3>
+          <p>{u.username ? '@' + u.username : 'без username'}</p>
         </div>
       </div>
-      <button className="btn" style={{ width: '100%' }} onClick={() => openTelegramLink(BRAND.managerUrl)}>
-        {ru.profile.support}
-      </button>
+      <div className="menu">
+        {items.map((i) => (
+          <button key={i.t} className="mi" onClick={i.on}>
+            <span className="mi-ico">{i.ico}</span>
+            <span className="mi-t">{i.t}{i.s && <small>{i.s}</small>}</span>
+            <span className="mi-ch">›</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
