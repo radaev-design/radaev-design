@@ -1,45 +1,218 @@
-import { createContext, ReactNode, useContext, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 
-type ToastType = 'success' | 'error' | 'info';
-type ToastItem = { id: number; message: string; type: ToastType };
+import { ReactNode, useEffect, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
+import WebApp from '@twa-dev/sdk';
+import { CategoryId } from '../../config/catalog';
+import { HomeScreen } from '../modules/home/HomeScreen';
+import { CatalogScreen } from '../modules/catalog/CatalogScreen';
+import { OrdersScreen } from '../modules/orders/OrdersScreen';
+import { ProfileScreen } from '../modules/profile/ProfileScreen';
+import { SettingsScreen } from '../modules/profile/SettingsScreen';
+import { CartProvider, useCart } from '../storage/cart';
+import { Splash } from '../ui/Splash';
+import { ToastProvider } from '../ui/Toast';
+import './extra.css';
+import './mascot-theme.css';
 
-const ToastContext = createContext<(message: string, type?: ToastType) => void>(() => {});
+type Tab = 'home' | 'catalog' | 'orders' | 'profile';
 
-export function ToastProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<ToastItem[]>([]);
+const svg = (c: ReactNode) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    {c}
+  </svg>
+);
 
-  const show = (message: string, type: ToastType = 'info') => {
-    const id = Date.now() + Math.random();
-    setItems((prev) => [...prev.slice(-2), { id, message, type }]);
+const TABS: { id: Tab; label: string; icon: ReactNode }[] = [
+  {
+    id: 'home',
+    label: 'Главная',
+    icon: svg(
+      <path d="M3 11l9-8 9 8v10a1 1 0 01-1 1h-5v-7H9v7H4a1 1 0 01-1-1z" />
+    ),
+  },
+  {
+    id: 'catalog',
+    label: 'Услуги',
+    icon: svg(
+      <>
+        <rect x="3" y="3" width="7" height="7" rx="2" />
+        <rect x="14" y="3" width="7" height="7" rx="2" />
+        <rect x="3" y="14" width="7" height="7" rx="2" />
+        <rect x="14" y="14" width="7" height="7" rx="2" />
+      </>
+    ),
+  },
+  {
+    id: 'orders',
+    label: 'Заказы',
+    icon: svg(
+      <>
+        <path d="M6 7h12l1 14H5z" />
+        <path d="M9 7a3 3 0 016 0" />
+      </>
+    ),
+  },
+  {
+    id: 'profile',
+    label: 'Профиль',
+    icon: svg(
+      <>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 21a8 8 0 0116 0" />
+      </>
+    ),
+  },
+];
 
-    window.setTimeout(() => {
-      setItems((prev) => prev.filter((item) => item.id !== id));
-    }, 2800);
+function applyTheme(dark: boolean) {
+  const bg = dark ? '#05030F' : '#F3F1FF';
+
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+
+  try {
+    WebApp.setHeaderColor(bg as any);
+    WebApp.setBackgroundColor(bg as any);
+  } catch {
+    // Telegram API недоступен вне Telegram
+  }
+}
+
+function Shell() {
+  const [splash, setSplash] = useState(true);
+  const [tab, setTab] = useState<Tab>('home');
+  const [sub, setSub] = useState<'settings' | null>(null);
+  const [cat, setCat] = useState<CategoryId | undefined>();
+
+  const [dark, setDark] = useState<boolean>(() => {
+    try {
+      const savedTheme = localStorage.getItem('theme');
+
+      if (savedTheme) {
+        return savedTheme === 'dark';
+      }
+
+      return WebApp.colorScheme === 'dark';
+    } catch {
+      return false;
+    }
+  });
+
+  const { ids } = useCart();
+
+  useEffect(() => {
+    applyTheme(dark);
+  }, [dark]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSplash(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const go = (t: Tab) => {
+    setTab(t);
+    setSub(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const openCatalog = (c?: CategoryId) => {
+    setCat(c);
+    go('catalog');
+  };
+
+  const setTheme = (d: boolean) => {
+    setDark(d);
+
+    try {
+      localStorage.setItem('theme', d ? 'dark' : 'light');
+    } catch {
+      // localStorage недоступен
+    }
   };
 
   return (
-    <ToastContext.Provider value={show}>
-      {children}
-      <div className="toast-stack" aria-live="polite">
-        <AnimatePresence>
-          {items.map((item) => (
-            <motion.div
-              key={item.id}
-              className={`toast toast-${item.type}`}
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-            >
-              <span>{item.type === 'success' ? '✓' : item.type === 'error' ? '!' : 'ℹ'}</span>
-              {item.message}
-            </motion.div>
-          ))}
-        </AnimatePresence>
+    <>
+      <AnimatePresence>
+        {splash && <Splash key="splash" />}
+      </AnimatePresence>
+
+      <div className="app">
+        {tab === 'home' && (
+          <HomeScreen
+            onOpenCatalog={openCatalog}
+            onOpenProfile={() => go('profile')}
+          />
+        )}
+
+        {tab === 'catalog' && (
+          <CatalogScreen
+            key={cat ?? 'all'}
+            initial={cat}
+          />
+        )}
+
+        {tab === 'orders' && (
+          <OrdersScreen
+            onCatalog={() => openCatalog()}
+          />
+        )}
+
+        {tab === 'profile' && !sub && (
+          <ProfileScreen
+            onOrders={() => go('orders')}
+            onSettings={() => setSub('settings')}
+          />
+        )}
+
+        {tab === 'profile' && sub === 'settings' && (
+          <SettingsScreen
+            dark={dark}
+            onTheme={setTheme}
+            onBack={() => setSub(null)}
+          />
+        )}
       </div>
-    </ToastContext.Provider>
+
+      <nav className="tabbar">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            id={'tab-' + t.id}
+            className={'tab' + (tab === t.id ? ' on' : '')}
+            onClick={() => go(t.id)}
+          >
+            {t.icon}
+            <span>{t.label}</span>
+
+            {t.id === 'orders' && ids.length > 0 && (
+              <span className="tab-badge">
+                {ids.length}
+              </span>
+            )}
+          </button>
+        ))}
+      </nav>
+    </>
   );
 }
 
-export const useToast = () => useContext(ToastContext);
+export function App() {
+  return (
+    <CartProvider>
+      <ToastProvider>
+        <Shell />
+      </ToastProvider>
+    </CartProvider>
+  );
+}
+
+export default App;
