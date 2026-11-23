@@ -264,3 +264,39 @@
     animation: none;
   }
 }
+
+/* ---------- HOME MASCOT ---------- */
+
+.home-mascot {
+  margin: 18px 0 22px;
+  padding: 0 2px;
+}
+
+.home-mascot .mascot-compact {
+  align-items: center;
+  gap: 12px;
+}
+
+.home-mascot .mascot-bubble {
+  background: linear-gradient(
+    135deg,
+    rgba(153, 126, 255, 0.09),
+    rgba(203, 183, 255, 0.12)
+  );
+  border-color: rgba(137, 110, 230, 0.12);
+}
+
+[data-theme="dark"] .home-mascot .mascot-bubble {
+  background: linear-gradient(
+    135deg,
+    rgba(115, 84, 220, 0.16),
+    rgba(165, 130, 255, 0.09)
+  );
+}
+
+@media (max-width: 480px) {
+  .home-mascot {
+    margin: 14px 0 18px;
+  }
+}
+
