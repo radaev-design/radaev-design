@@ -223,48 +223,6 @@
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
 }
 
-/* ---------- MOBILE ---------- */
-
-@media (max-width: 480px) {
-  .mascot-guide {
-    gap: 10px;
-  }
-
-  .mascot-bubble {
-    max-width: 280px;
-    padding: 12px 15px;
-    font-size: 13px;
-    border-radius: 17px;
-  }
-
-  .mascot-compact {
-    gap: 10px;
-  }
-
-  .toast-container {
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
-  .toast {
-    max-width: 100%;
-    padding: 12px 15px;
-    border-radius: 16px;
-  }
-
-  .toast-message {
-    font-size: 13px;
-  }
-}
-
-/* ---------- ACCESSIBILITY ---------- */
-
-@media (prefers-reduced-motion: reduce) {
-  .mascot-guide:not(.mascot-compact) .mascot-image {
-    animation: none;
-  }
-}
-
 /* ---------- HOME MASCOT ---------- */
 
 .home-mascot {
@@ -294,9 +252,298 @@
   );
 }
 
+/* =========================================
+   MODO — ONBOARDING
+   ========================================= */
+
+.modo-tour-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+  box-sizing: border-box;
+  overflow-y: auto;
+  background: rgba(5, 3, 15, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.modo-tour-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 420px;
+  padding: 28px 22px 24px;
+  gap: 22px;
+  border-radius: 30px;
+  background: #121426;
+  color: #f5f4ff;
+  border: 1px solid rgba(140, 120, 255, 0.18);
+  box-shadow:
+    0 25px 80px rgba(0, 0, 0, 0.45),
+    0 0 45px rgba(75, 50, 210, 0.08);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.modo-tour-mascot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  height: 160px;
+  max-width: 100%;
+  border-radius: 30px;
+  background: rgba(110, 85, 225, 0.12);
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.modo-tour-mascot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 24px rgba(100, 75, 255, 0.16));
+}
+
+.modo-tour-emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 84px;
+  line-height: 1;
+}
+
+.modo-tour-bubble {
+  position: relative;
+  width: 100%;
+  padding: 22px 20px;
+  border-radius: 23px;
+  background: #19152a;
+  border: 1px solid rgba(155, 125, 255, 0.2);
+  box-sizing: border-box;
+}
+
+.modo-tour-bubble h2 {
+  margin: 0 0 10px;
+  color: #ffffff;
+  font-size: 23px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.modo-tour-bubble p {
+  margin: 0;
+  color: #f3efff;
+  font-size: 16px;
+  line-height: 1.65;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.modo-tour-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+  color: #aaa6c5;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.modo-tour-actions {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
+}
+
+.modo-tour-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 54px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  border: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 750;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.18s ease,
+    opacity 0.18s ease,
+    background 0.18s ease;
+}
+
+.modo-tour-actions button:active {
+  transform: scale(0.97);
+}
+
+.modo-tour-primary {
+  color: #ffffff;
+  background: linear-gradient(135deg, #3454ff, #5337ef);
+  box-shadow: 0 8px 24px rgba(53, 70, 255, 0.25);
+}
+
+.modo-tour-primary:hover {
+  opacity: 0.94;
+}
+
+.modo-tour-secondary {
+  color: #b9b4d0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(150, 130, 255, 0.12) !important;
+}
+
+.modo-tour-secondary:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* ---------- LIGHT THEME TOUR ---------- */
+
+[data-theme="light"] .modo-tour-overlay {
+  background: rgba(28, 22, 55, 0.65);
+}
+
+[data-theme="light"] .modo-tour-panel {
+  background: #ffffff;
+  color: #171326;
+  border-color: rgba(125, 100, 230, 0.16);
+  box-shadow: 0 25px 80px rgba(20, 15, 50, 0.25);
+}
+
+[data-theme="light"] .modo-tour-mascot {
+  background: rgba(110, 85, 225, 0.08);
+}
+
+[data-theme="light"] .modo-tour-bubble {
+  background: #f7f5ff;
+  border-color: rgba(125, 100, 230, 0.15);
+}
+
+[data-theme="light"] .modo-tour-bubble h2 {
+  color: #171326;
+}
+
+[data-theme="light"] .modo-tour-bubble p {
+  color: #39334f;
+}
+
+[data-theme="light"] .modo-tour-progress {
+  color: #716b8b;
+}
+
+[data-theme="light"] .modo-tour-secondary {
+  color: #716b8b;
+  background: #f5f3fb;
+  border-color: rgba(125, 100, 230, 0.12) !important;
+}
+
+/* ---------- MOBILE ---------- */
+
 @media (max-width: 480px) {
+  .mascot-guide {
+    gap: 10px;
+  }
+
+  .mascot-bubble {
+    max-width: 280px;
+    padding: 12px 15px;
+    font-size: 13px;
+    border-radius: 17px;
+  }
+
+  .mascot-compact {
+    gap: 10px;
+  }
+
   .home-mascot {
     margin: 14px 0 18px;
   }
+
+  .toast-container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .toast {
+    max-width: 100%;
+    padding: 12px 15px;
+    border-radius: 16px;
+  }
+
+  .toast-message {
+    font-size: 13px;
+  }
+
+  .modo-tour-overlay {
+    padding-left: 14px;
+    padding-right: 14px;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 14px);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  }
+
+  .modo-tour-panel {
+    max-width: 100%;
+    padding: 22px 18px 20px;
+    gap: 18px;
+    border-radius: 26px;
+  }
+
+  .modo-tour-mascot {
+    width: 136px;
+    height: 136px;
+    border-radius: 26px;
+  }
+
+  .modo-tour-emoji {
+    font-size: 72px;
+  }
+
+  .modo-tour-bubble {
+    padding: 19px 17px;
+    border-radius: 20px;
+  }
+
+  .modo-tour-bubble h2 {
+    font-size: 21px;
+  }
+
+  .modo-tour-bubble p {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .modo-tour-actions button {
+    min-height: 52px;
+    border-radius: 16px;
+  }
 }
 
+/* ---------- ACCESSIBILITY ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot-guide:not(.mascot-compact) .mascot-image {
+    animation: none;
+  }
+
+  .modo-tour-actions button {
+    transition: none;
+  }
+}
