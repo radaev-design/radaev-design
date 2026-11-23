@@ -11,17 +11,39 @@ import { haptic } from '../../integrations/telegram';
 import { useCart } from '../../storage/cart';
 import { fly, openLink } from '../../ui/utils';
 import { useToast } from '../../ui/Toast';
-import { MascotGuide } from '../../ui/MascotGuide';
 
 export function CatalogScreen({ initial }: { initial?: CategoryId }) {
   const [cat, setCat] = useState<CategoryId | undefined>(initial);
-
   const { has, add, remove } = useCart();
   const { toast } = useToast();
 
   const list = activeServices().filter(
-    (s) => !cat || s.category === cat,
+    (s) => !cat || s.category === cat
   );
+
+  const handleAdd = (id: typeof list[number]['id'], element: HTMLElement) => {
+    haptic('medium');
+    fly(element);
+    add(id);
+    toast('Услуга добавлена в заказ', 'success');
+  };
+
+  const handleRemove = (id: typeof list[number]['id']) => {
+    haptic();
+    remove(id);
+    toast('Услуга удалена из заказа', 'info');
+  };
+
+  const handlePreorder = (title: string) => {
+    haptic('medium');
+    toast('Открываем менеджера для предзаказа', 'info');
+
+    openLink(
+      `${BRAND.managerUrl}?text=${encodeURIComponent(
+        'Хочу оформить предзаказ: ' + title
+      )}`
+    );
+  };
 
   return (
     <div className="screen">
@@ -46,21 +68,11 @@ export function CatalogScreen({ initial }: { initial?: CategoryId }) {
         ))}
       </div>
 
-      <div className="catalog-mascot">
-        <MascotGuide
-          pose="point"
-          size={96}
-          compact
-          text="Выбирай услуги, которые тебе нужны! Добавляй их в заказ, а я помогу."
-        />
-      </div>
-
       {list.length === 0 ? (
-        <MascotGuide
-          pose="question"
-          size={140}
-          text="В этой категории пока нет доступных услуг."
-        />
+        <div className="empty">
+          <h2>Услуг пока нет</h2>
+          <p>В этой категории пока нет доступных услуг.</p>
+        </div>
       ) : (
         list.map((s) => (
           <div key={s.id} className="card svc">
@@ -73,48 +85,30 @@ export function CatalogScreen({ initial }: { initial?: CategoryId }) {
             )}
 
             <h3>{s.title}</h3>
-
             <p>{s.description}</p>
 
-            <div className="price">{formatPrice(s)}</div>
+            <div className="price">
+              {formatPrice(s)}
+            </div>
 
             {s.comingSoon ? (
               <button
                 className="btn svc-btn secondary"
-                onClick={() => {
-                  haptic();
-
-                  toast('Открываем менеджера для предзаказа', 'info');
-
-                  openLink(
-                    `${BRAND.managerUrl}?text=${encodeURIComponent(
-                      'Хочу оформить предзаказ: ' + s.title,
-                    )}`,
-                  );
-                }}
+                onClick={() => handlePreorder(s.title)}
               >
                 Оформить предзаказ
               </button>
             ) : has(s.id) ? (
               <button
                 className="btn svc-btn secondary"
-                onClick={() => {
-                  haptic();
-                  remove(s.id);
-                  toast('Услуга удалена из заказа', 'info');
-                }}
+                onClick={() => handleRemove(s.id)}
               >
                 ✓ В заказе · убрать
               </button>
             ) : (
               <button
                 className="btn svc-btn"
-                onClick={(e) => {
-                  haptic('medium');
-                  fly(e.currentTarget);
-                  add(s.id);
-                  toast('Услуга добавлена в заказ ✨', 'success');
-                }}
+                onClick={(e) => handleAdd(s.id, e.currentTarget)}
               >
                 Заказать
               </button>
