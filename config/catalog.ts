@@ -1,7 +1,8 @@
-// ЕДИНСТВЕННОЕ место, где владелец меняет услуги, цены, описания и опции.
-// priceFrom: null  ->  «Стоимость рассчитывается индивидуально».
-// active: false    ->  услуга скрыта из каталога.
+// ЕДИНСТВЕННОЕ место, где владелец меняет услуги, описания и опции.
+// Цены и подписи карточек: config/pricing.ts.
+// active: false -> услуга скрыта из каталога.
 import { PITCH, PRICES } from './pricing';
+
 export type CategoryId = 'design' | 'video' | 'ai-photo' | 'telegram';
 
 export interface Category {
@@ -17,10 +18,13 @@ export interface Service {
   title: string;
   description: string;
   priceFrom: number | null;
-  unit?: string; // например «за ролик», «за фото»
+  unit?: string;
   active: boolean;
   popular?: boolean;
-  comingSoon?: boolean; // true -> оформляется как предзаказ
+  comingSoon?: boolean; // true -> предзаказ через менеджера
+  badge?: string;
+  slogan?: string;
+  hint?: string;
 }
 
 export const BRAND = {
@@ -32,17 +36,16 @@ export const BRAND = {
   adminBot: 'modoadmindesign_bot',
 };
 
-// Срочность: multiplier: null -> цена уточняется индивидуально.
 export const URGENCY = [
   { id: 'standard', label: 'Стандартно', multiplier: 1 },
   { id: 'rush', label: 'Срочно', multiplier: null as number | null },
 ];
 
 export const CATEGORIES: Category[] = [
-  { id: 'design', title: 'Дизайн', subtitle: 'Бренд, графика, UI/UX', color: '#153CFF' },
-  { id: 'video', title: 'Видео', subtitle: 'Монтаж и motion', color: '#FF5B4D' },
-  { id: 'ai-photo', title: 'AI-фотосессии', subtitle: 'Нейрофотографии', color: '#7A4DFF' },
-  { id: 'telegram', title: 'Telegram', subtitle: 'Боты, Mini Apps, виджеты', color: '#0A1B66' },
+  { id: 'design', title: 'Дизайн', subtitle: 'Бренд, графика, UI/UX', color: '#ff0055' },
+  { id: 'video', title: 'Видео', subtitle: 'Монтаж и motion', color: '#c4003f' },
+  { id: 'ai-photo', title: 'AI-фотосессии', subtitle: 'Нейрофотографии', color: '#5c0a2a' },
+  { id: 'telegram', title: 'Telegram', subtitle: 'Боты, Mini Apps, виджеты', color: '#0d0303' },
 ];
 
 const s = (
@@ -53,7 +56,7 @@ const s = (
   extra: Partial<Service> = {},
 ): Service => ({ id, category, title, description, priceFrom: null, active: true, ...extra });
 
-export const SERVICES: Service[] = [
+const BASE: Service[] = [
   // DESIGN
   s('design', 'logo', 'Разработка логотипа', 'Узнаваемый знак для вашего проекта', { popular: true }),
   s('design', 'identity', 'Фирменный стиль', 'Цвета, шрифты, носители, гайд'),
@@ -94,6 +97,12 @@ export const SERVICES: Service[] = [
   s('telegram', 'miniapp', 'Telegram Mini Apps', 'Полноценные приложения в Telegram', { comingSoon: true }),
   s('telegram', 'widgets', 'Интерактивные Telegram-виджеты', 'Лёгкие интерактивные модули', { comingSoon: true }),
 ];
+
+export const SERVICES: Service[] = BASE.map((x) => ({
+  ...x,
+  priceFrom: PRICES[x.id] ?? null,
+  ...PITCH[x.id],
+}));
 
 export const activeServices = () => SERVICES.filter((x) => x.active);
 
