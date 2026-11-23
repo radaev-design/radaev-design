@@ -28,7 +28,7 @@ export function CatalogScreen({ initial }: { initial?: CategoryId }) {
           <p>В этой категории пока нет доступных услуг.</p>
         </div>
       ) : (
-        list.map((s) => <ServiceCard key={s.id} s={s} />)
+        list.map((s, i) => <ServiceCard key={s.id} s={s} n={i + 1} />)
       )}
     </div>
   );
