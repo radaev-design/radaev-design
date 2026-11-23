@@ -1,218 +1,93 @@
 
-import { ReactNode, useEffect, useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
-import WebApp from '@twa-dev/sdk';
-import { CategoryId } from '../../config/catalog';
-import { HomeScreen } from '../modules/home/HomeScreen';
-import { CatalogScreen } from '../modules/catalog/CatalogScreen';
-import { OrdersScreen } from '../modules/orders/OrdersScreen';
-import { ProfileScreen } from '../modules/profile/ProfileScreen';
-import { SettingsScreen } from '../modules/profile/SettingsScreen';
-import { CartProvider, useCart } from '../storage/cart';
-import { Splash } from '../ui/Splash';
-import { ToastProvider } from '../ui/Toast';
-import './extra.css';
-import './mascot-theme.css';
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  ReactNode,
+} from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 
-type Tab = 'home' | 'catalog' | 'orders' | 'profile';
+export type ToastType = 'success' | 'info' | 'error';
 
-const svg = (c: ReactNode) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    {c}
-  </svg>
-);
+type ToastData = {
+  message: string;
+  type: ToastType;
+  id: number;
+};
 
-const TABS: { id: Tab; label: string; icon: ReactNode }[] = [
-  {
-    id: 'home',
-    label: 'Главная',
-    icon: svg(
-      <path d="M3 11l9-8 9 8v10a1 1 0 01-1 1h-5v-7H9v7H4a1 1 0 01-1-1z" />
-    ),
-  },
-  {
-    id: 'catalog',
-    label: 'Услуги',
-    icon: svg(
-      <>
-        <rect x="3" y="3" width="7" height="7" rx="2" />
-        <rect x="14" y="3" width="7" height="7" rx="2" />
-        <rect x="3" y="14" width="7" height="7" rx="2" />
-        <rect x="14" y="14" width="7" height="7" rx="2" />
-      </>
-    ),
-  },
-  {
-    id: 'orders',
-    label: 'Заказы',
-    icon: svg(
-      <>
-        <path d="M6 7h12l1 14H5z" />
-        <path d="M9 7a3 3 0 016 0" />
-      </>
-    ),
-  },
-  {
-    id: 'profile',
-    label: 'Профиль',
-    icon: svg(
-      <>
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 21a8 8 0 0116 0" />
-      </>
-    ),
-  },
-];
+type ToastContextType = {
+  toast: (message: string, type?: ToastType) => void;
+};
 
-function applyTheme(dark: boolean) {
-  const bg = dark ? '#05030F' : '#F3F1FF';
+const ToastContext = createContext<ToastContextType | null>(null);
 
-  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+const TOAST_ICONS: Record<ToastType, string> = {
+  success: '✓',
+  info: 'i',
+  error: '!',
+};
 
-  try {
-    WebApp.setHeaderColor(bg as any);
-    WebApp.setBackgroundColor(bg as any);
-  } catch {
-    // Telegram API недоступен вне Telegram
-  }
-}
+export function ToastProvider({ children }: { children: ReactNode }) {
+  const [currentToast, setCurrentToast] = useState<ToastData | null>(null);
 
-function Shell() {
-  const [splash, setSplash] = useState(true);
-  const [tab, setTab] = useState<Tab>('home');
-  const [sub, setSub] = useState<'settings' | null>(null);
-  const [cat, setCat] = useState<CategoryId | undefined>();
-
-  const [dark, setDark] = useState<boolean>(() => {
-    try {
-      const savedTheme = localStorage.getItem('theme');
-
-      if (savedTheme) {
-        return savedTheme === 'dark';
-      }
-
-      return WebApp.colorScheme === 'dark';
-    } catch {
-      return false;
-    }
-  });
-
-  const { ids } = useCart();
-
-  useEffect(() => {
-    applyTheme(dark);
-  }, [dark]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setSplash(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
+  const toast = useCallback((message: string, type: ToastType = 'info') => {
+    setCurrentToast({
+      message,
+      type,
+      id: Date.now(),
+    });
   }, []);
 
-  const go = (t: Tab) => {
-    setTab(t);
-    setSub(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  useEffect(() => {
+    if (!currentToast) return;
 
-  const openCatalog = (c?: CategoryId) => {
-    setCat(c);
-    go('catalog');
-  };
+    const timer = setTimeout(() => {
+      setCurrentToast(null);
+    }, 2800);
 
-  const setTheme = (d: boolean) => {
-    setDark(d);
-
-    try {
-      localStorage.setItem('theme', d ? 'dark' : 'light');
-    } catch {
-      // localStorage недоступен
-    }
-  };
+    return () => clearTimeout(timer);
+  }, [currentToast]);
 
   return (
-    <>
-      <AnimatePresence>
-        {splash && <Splash key="splash" />}
-      </AnimatePresence>
+    <ToastContext.Provider value={{ toast }}>
+      {children}
 
-      <div className="app">
-        {tab === 'home' && (
-          <HomeScreen
-            onOpenCatalog={openCatalog}
-            onOpenProfile={() => go('profile')}
-          />
-        )}
-
-        {tab === 'catalog' && (
-          <CatalogScreen
-            key={cat ?? 'all'}
-            initial={cat}
-          />
-        )}
-
-        {tab === 'orders' && (
-          <OrdersScreen
-            onCatalog={() => openCatalog()}
-          />
-        )}
-
-        {tab === 'profile' && !sub && (
-          <ProfileScreen
-            onOrders={() => go('orders')}
-            onSettings={() => setSub('settings')}
-          />
-        )}
-
-        {tab === 'profile' && sub === 'settings' && (
-          <SettingsScreen
-            dark={dark}
-            onTheme={setTheme}
-            onBack={() => setSub(null)}
-          />
-        )}
-      </div>
-
-      <nav className="tabbar">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            id={'tab-' + t.id}
-            className={'tab' + (tab === t.id ? ' on' : '')}
-            onClick={() => go(t.id)}
-          >
-            {t.icon}
-            <span>{t.label}</span>
-
-            {t.id === 'orders' && ids.length > 0 && (
-              <span className="tab-badge">
-                {ids.length}
+      <div className="toast-container">
+        <AnimatePresence mode="wait">
+          {currentToast && (
+            <motion.div
+              key={currentToast.id}
+              className={`toast toast-${currentToast.type}`}
+              initial={{ opacity: 0, y: 24, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 12, scale: 0.95 }}
+              transition={{ duration: 0.22 }}
+              role="status"
+              aria-live="polite"
+            >
+              <span className="toast-icon">
+                {TOAST_ICONS[currentToast.type]}
               </span>
-            )}
-          </button>
-        ))}
-      </nav>
-    </>
+
+              <span className="toast-message">
+                {currentToast.message}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </ToastContext.Provider>
   );
 }
 
-export function App() {
-  return (
-    <CartProvider>
-      <ToastProvider>
-        <Shell />
-      </ToastProvider>
-    </CartProvider>
-  );
-}
+export function useToast() {
+  const context = useContext(ToastContext);
 
-export default App;
+  if (!context) {
+    throw new Error('useToast must be used within ToastProvider');
+  }
+
+  return context;
+}
