@@ -8,10 +8,14 @@ export function initTelegram() {
     WebApp.expand();
     WebApp.setHeaderColor(BG);
     WebApp.setBackgroundColor(BG);
+    // Не даём свайпу вниз сворачивать приложение (Bot API 7.7+).
+    WebApp.disableVerticalSwipes();
   } catch {
     /* запуск вне Telegram (браузер) — просто работаем без SDK */
   }
 }
+
+document.documentElement.style.overscrollBehavior = 'none';
 
 export interface TgUser {
   id?: number;
