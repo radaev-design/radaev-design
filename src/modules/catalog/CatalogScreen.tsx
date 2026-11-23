@@ -1,68 +1,44 @@
-
 import { useState } from 'react';
-import {
-  activeServices,
-  CATEGORIES,
-  CategoryId,
-  formatPrice,
-  BRAND,
-} from '../../../config/catalog';
-import { haptic } from '../../integrations/telegram';
+import { activeServices, BRAND, CATEGORIES, CategoryId, formatPrice, Service } from '../../../config/catalog';
+import { haptic, openLink } from '../../integrations/telegram';
 import { useCart } from '../../storage/cart';
-import { fly, openLink } from '../../ui/utils';
+import { Button } from '../../ui/Button';
+import { Mascot } from '../../ui/Mascot';
 import { useToast } from '../../ui/Toast';
+import { fly } from '../../ui/utils';
 
 export function CatalogScreen({ initial }: { initial?: CategoryId }) {
   const [cat, setCat] = useState<CategoryId | undefined>(initial);
   const { has, add, remove } = useCart();
   const { toast } = useToast();
+  const list = activeServices().filter((s) => !cat || s.category === cat);
 
-  const list = activeServices().filter(
-    (s) => !cat || s.category === cat
-  );
-
-  const handleAdd = (id: typeof list[number]['id'], element: HTMLElement) => {
+  const onAdd = (s: Service, el: HTMLElement) => {
     haptic('medium');
-    fly(element);
-    add(id);
+    fly(el);
+    add(s.id);
     toast('Услуга добавлена в заказ', 'success');
   };
-
-  const handleRemove = (id: typeof list[number]['id']) => {
+  const onRemove = (s: Service) => {
     haptic();
-    remove(id);
+    remove(s.id);
     toast('Услуга удалена из заказа', 'info');
   };
-
-  const handlePreorder = (title: string) => {
+  const onPreorder = (s: Service) => {
     haptic('medium');
     toast('Открываем менеджера для предзаказа', 'info');
-
-    openLink(
-      `${BRAND.managerUrl}?text=${encodeURIComponent(
-        'Хочу оформить предзаказ: ' + title
-      )}`
-    );
+    openLink(`${BRAND.managerUrl}?text=${encodeURIComponent('Хочу оформить предзаказ: ' + s.title)}`);
   };
 
   return (
     <div className="screen">
       <h1>Услуги</h1>
-
       <div className="chips">
-        <button
-          className={'chip' + (!cat ? ' on' : '')}
-          onClick={() => setCat(undefined)}
-        >
+        <button className={'chip' + (!cat ? ' on' : '')} onClick={() => setCat(undefined)}>
           Все
         </button>
-
         {CATEGORIES.map((c) => (
-          <button
-            key={c.id}
-            className={'chip' + (cat === c.id ? ' on' : '')}
-            onClick={() => setCat(c.id)}
-          >
+          <button key={c.id} className={'chip' + (cat === c.id ? ' on' : '')} onClick={() => setCat(c.id)}>
             {c.title}
           </button>
         ))}
@@ -70,48 +46,33 @@ export function CatalogScreen({ initial }: { initial?: CategoryId }) {
 
       {list.length === 0 ? (
         <div className="empty">
+          <Mascot pose="sad" size={110} />
           <h2>Услуг пока нет</h2>
           <p>В этой категории пока нет доступных услуг.</p>
         </div>
       ) : (
         list.map((s) => (
           <div key={s.id} className="card svc">
-            {s.comingSoon && (
+            {s.comingSoon ? (
               <span className="badge">COMING SOON</span>
+            ) : (
+              s.popular && <span className="badge pop">ПОПУЛЯРНО</span>
             )}
-
-            {s.popular && !s.comingSoon && (
-              <span className="badge pop">ПОПУЛЯРНО</span>
-            )}
-
             <h3>{s.title}</h3>
             <p>{s.description}</p>
-
-            <div className="price">
-              {formatPrice(s)}
-            </div>
-
+            <div className="price">{formatPrice(s)}</div>
             {s.comingSoon ? (
-              <button
-                className="btn svc-btn secondary"
-                onClick={() => handlePreorder(s.title)}
-              >
+              <Button variant="secondary" className="svc-btn" onClick={() => onPreorder(s)}>
                 Оформить предзаказ
-              </button>
+              </Button>
             ) : has(s.id) ? (
-              <button
-                className="btn svc-btn secondary"
-                onClick={() => handleRemove(s.id)}
-              >
+              <Button variant="secondary" className="svc-btn" onClick={() => onRemove(s)}>
                 ✓ В заказе · убрать
-              </button>
+              </Button>
             ) : (
-              <button
-                className="btn svc-btn"
-                onClick={(e) => handleAdd(s.id, e.currentTarget)}
-              >
+              <Button className="svc-btn" onClick={(e) => onAdd(s, e.currentTarget)}>
                 Заказать
-              </button>
+              </Button>
             )}
           </div>
         ))
