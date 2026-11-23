@@ -67,8 +67,8 @@ export function HomeScreen({ onOpenCatalog, onOpenProfile }: Props) {
         <>
           <h2>Популярное</h2>
           <div className="hscroll">
-            {popular.map((s) => (
-              <ServiceCard key={s.id} s={s} className="svc-h" />
+            {popular.map((s, i) => (
+              <ServiceCard key={s.id} s={s} n={i + 1} className="svc-h" />
             ))}
           </div>
         </>
@@ -107,8 +107,8 @@ export function HomeScreen({ onOpenCatalog, onOpenProfile }: Props) {
               <p className="muted">Оформите предзаказ первыми</p>
             </div>
           </div>
-          {soon.map((s) => (
-            <ServiceCard key={s.id} s={s} />
+          {soon.map((s, i) => (
+            <ServiceCard key={s.id} s={s} n={i + 1} />
           ))}
         </>
       )}
