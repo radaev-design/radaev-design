@@ -2,6 +2,7 @@ import { CATEGORIES, CategoryId } from '../../../config/catalog';
 import { ru } from '../../i18n/ru';
 import { getUser } from '../../integrations/telegram';
 import { Banners } from './Banners';
+import { Stories } from './Stories';
 
 interface Props {
   onOpenCatalog: (cat?: CategoryId) => void;
@@ -30,6 +31,8 @@ export function HomeScreen({ onOpenCatalog, onOpenProfile }: Props) {
           {user.photoUrl ? '' : user.firstName[0]}
         </button>
       </header>
+
+      <Stories />
 
       <section className="hero">
         <div className="obj sphere" />
