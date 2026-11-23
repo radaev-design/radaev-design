@@ -4,6 +4,7 @@ import { LINKS } from '../../../config/links';
 import { getUser, haptic } from '../../integrations/telegram';
 import { useCart } from '../../storage/cart';
 import { openLink } from '../../ui/utils';
+import { useToast } from '../../ui/Toast';
 import { MascotGuide } from '../../ui/MascotGuide';
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 export function ProfileScreen({ onOrders, onSettings }: Props) {
   const u = getUser();
   const { ids } = useCart();
+  const { toast } = useToast();
 
   const firstName = u.firstName || 'Пользователь';
 
@@ -35,7 +37,6 @@ export function ProfileScreen({ onOrders, onSettings }: Props) {
       s: ids.length ? `Выбрано: ${ids.length}` : undefined,
       on: onOrders,
     },
-
     ...(LINKS.channel
       ? [
           {
@@ -45,7 +46,6 @@ export function ProfileScreen({ onOrders, onSettings }: Props) {
           },
         ]
       : []),
-
     ...(LINKS.portfolio
       ? [
           {
@@ -55,7 +55,6 @@ export function ProfileScreen({ onOrders, onSettings }: Props) {
           },
         ]
       : []),
-
     ...(LINKS.reviews
       ? [
           {
@@ -65,19 +64,23 @@ export function ProfileScreen({ onOrders, onSettings }: Props) {
           },
         ]
       : []),
-
     {
       ico: '💬',
       t: 'Написать менеджеру',
-      on: () => openLink(BRAND.managerUrl),
+      on: () => {
+        haptic('medium');
+        toast('Открываем менеджера в Telegram', 'info');
+        openLink(BRAND.managerUrl);
+      },
     },
-
     {
       ico: '🎁',
       t: 'Пригласить друга',
-      on: () => openLink(share),
+      on: () => {
+        haptic();
+        openLink(share);
+      },
     },
-
     {
       ico: '⚙️',
       t: 'Настройки',
@@ -87,13 +90,11 @@ export function ProfileScreen({ onOrders, onSettings }: Props) {
 
   return (
     <div className="screen">
-      <h1>Профиль</h1>
-
       <MascotGuide
         pose="hello"
-        size={92}
+        size={100}
         compact
-        text={`Рад видеть тебя, ${firstName}! Здесь всё, что нужно для работы со студией.`}
+        text={`Привет, ${firstName}! Здесь всё управление твоим аккаунтом.`}
       />
 
       <div className="card pf">
