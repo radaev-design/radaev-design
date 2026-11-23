@@ -1,7 +1,7 @@
-
 import { CATEGORIES, CategoryId } from '../../../config/catalog';
 import { ru } from '../../i18n/ru';
 import { getUser } from '../../integrations/telegram';
+import { Button } from '../../ui/Button';
 import { Banners } from './Banners';
 import { Stories } from './Stories';
 
@@ -12,7 +12,6 @@ interface Props {
 
 export function HomeScreen({ onOpenCatalog, onOpenProfile }: Props) {
   const user = getUser();
-  const firstName = user.firstName || 'друг';
 
   return (
     <div className="screen">
@@ -21,23 +20,17 @@ export function HomeScreen({ onOpenCatalog, onOpenProfile }: Props) {
           <div className="logo">
             RADAEV<b>.DESIGN</b>
           </div>
-
           <div className="hello">
-            {ru.home.hello}, {firstName}
+            {ru.home.hello}, {user.firstName}
           </div>
         </div>
-
         <button
           className="avatar"
           aria-label="Профиль"
           onClick={onOpenProfile}
-          style={
-            user.photoUrl
-              ? { backgroundImage: `url(${user.photoUrl})` }
-              : undefined
-          }
+          style={user.photoUrl ? { backgroundImage: `url(${user.photoUrl})` } : undefined}
         >
-          {user.photoUrl ? '' : firstName[0]}
+          {user.photoUrl ? '' : user.firstName[0]}
         </button>
       </header>
 
@@ -47,27 +40,17 @@ export function HomeScreen({ onOpenCatalog, onOpenProfile }: Props) {
         <div className="obj sphere" />
         <div className="obj cube" />
         <div className="obj ring" />
-
         <h1>{ru.home.heroTitle}</h1>
         <p>{ru.home.heroSub}</p>
-
-        <button className="btn" onClick={() => onOpenCatalog()}>
-          {ru.home.cta}
-        </button>
+        <Button onClick={() => onOpenCatalog()}>{ru.home.cta}</Button>
       </section>
 
       <Banners onOpen={onOpenCatalog} />
 
       <h2>{ru.home.categories}</h2>
-
       <div className="grid2">
         {CATEGORIES.map((c) => (
-          <button
-            key={c.id}
-            className="cat"
-            style={{ background: c.color }}
-            onClick={() => onOpenCatalog(c.id)}
-          >
+          <button key={c.id} className="cat" style={{ background: c.color }} onClick={() => onOpenCatalog(c.id)}>
             <b>{c.title}</b>
             <span>{c.subtitle}</span>
           </button>
