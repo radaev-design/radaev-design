@@ -4,7 +4,6 @@ import { haptic } from '../../integrations/telegram';
 import { useCart } from '../../storage/cart';
 import { openLink } from '../../ui/utils';
 import { useToast } from '../../ui/Toast';
-import { MascotGuide } from '../../ui/MascotGuide';
 
 export function OrdersScreen({ onCatalog }: { onCatalog: () => void }) {
   const { ids, remove, clear } = useCart();
@@ -17,15 +16,13 @@ export function OrdersScreen({ onCatalog }: { onCatalog: () => void }) {
   if (!items.length) {
     return (
       <div className="screen empty">
-        <MascotGuide
-          pose="sad"
-          size={160}
-          text="Твой заказ пока пуст. Давай найдём что-нибудь интересное!"
-        />
+        <div className="ico">🛍️</div>
 
         <h2>Пока пусто</h2>
 
-        <p>Выберите услугу в каталоге, и она появится здесь.</p>
+        <p>
+          Выберите услугу в каталоге, и она появится здесь.
+        </p>
 
         <button
           className="btn"
@@ -47,13 +44,6 @@ export function OrdersScreen({ onCatalog }: { onCatalog: () => void }) {
   return (
     <div className="screen">
       <h1>Заказы</h1>
-
-      <MascotGuide
-        pose="think"
-        size={90}
-        compact
-        text="Проверь выбранные услуги. Если всё готово — отправляй заявку менеджеру!"
-      />
 
       <p className="muted">
         Выбранные услуги. Сейчас заявка отправляется менеджеру
@@ -89,7 +79,7 @@ export function OrdersScreen({ onCatalog }: { onCatalog: () => void }) {
           toast('Открываем менеджера в Telegram', 'info');
 
           openLink(
-            `${BRAND.managerUrl}?text=${encodeURIComponent(text)}`,
+            `${BRAND.managerUrl}?text=${encodeURIComponent(text)}`
           );
         }}
       >
