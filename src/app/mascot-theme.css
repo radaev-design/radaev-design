@@ -1,66 +1,266 @@
-/* Палитра маскота: светлая и тёмная темы. Подключается ПОСЛЕ extra.css и перекрашивает всё. */
-:root {
-  --blue: #5b3cff;
-  --deep: #1b1464;
-  --bg: #f3f1ff;
-  --white: #ffffff;
-  --black: #12103a;
-  --muted: #6f6a9a;
-  --accent: #c84bff;
-  --grad: linear-gradient(135deg, #2f6bff 0%, #7b3cff 55%, #d14bff 100%);
-  --shadow: 0 10px 30px rgba(91, 60, 255, 0.14);
-}
-:root[data-theme='dark'] {
-  --blue: #7b5cff;
-  --deep: #c9b8ff;
-  --bg: #05030f;
-  --white: #120b2e;
-  --black: #f3f0ff;
-  --muted: #a49fd0;
-  --accent: #d14bff;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(123, 92, 255, 0.14);
+
+/* =========================================
+   RADAEV.DESIGN — MASCOT & TOAST THEME
+   ========================================= */
+
+/* ---------- MASCOT GUIDE ---------- */
+
+.mascot-guide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 12px;
+  position: relative;
+  box-sizing: border-box;
+  text-align: center;
 }
 
-/* Кнопки, вкладки, чипы */
-.btn { background: var(--grad); box-shadow: 0 8px 22px rgba(123, 60, 255, 0.4); }
-.btn.secondary { background: var(--white); color: var(--blue); box-shadow: var(--shadow); }
-.tab.on { background: var(--grad); }
-.chip.on { background: var(--grad); }
-.badge.pop { background: #ece8ff; color: var(--blue); }
-.avatar { background-color: var(--blue); }
-
-/* Hero и 3D-объекты */
-.hero {
-  background: radial-gradient(circle at 85% 8%, #ff7af0 0%, #7b3cff 38%, #2f6bff 72%, #1b1464 100%);
-  box-shadow: 0 20px 40px rgba(123, 60, 255, 0.35);
-}
-.sphere, .sp-orb.o1 { background: radial-gradient(circle at 30% 28%, #d8f3ff, #3cc8ff 50%, #2f6bff); }
-
-/* Истории */
-.st-ring:not(.seen) { background: conic-gradient(#3cc8ff, #7b3cff, #ff7af0, #3cc8ff); }
-.st-av { background-color: var(--blue); }
-
-/* Заставка */
-.splash { background: radial-gradient(circle at 50% 35%, #3b1d9a 0%, #120b2e 45%, #05030f 100%); }
-.sp-logo b { color: #ff9cf5; }
-
-/* Тёмная тема */
-[data-theme='dark'] .tabbar { background: rgba(18, 11, 46, 0.88); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(123, 92, 255, 0.2); }
-[data-theme='dark'] .badge.pop { background: #2a1b5e; color: #c9b8ff; }
-[data-theme='dark'] .btn.secondary { background: #1d1244; color: #c9b8ff; }
-[data-theme='dark'] .skeleton { background: linear-gradient(90deg, #1a1140 25%, #2a1b5e 50%, #1a1140 75%); background-size: 200% 100%; }
-[data-theme='dark'] .bn-dots button { background: #3a2a78; }
-[data-theme='dark'] .bn-dots button.on { background: var(--blue); }
-[data-theme='dark'] .logo { color: #fff; }
-
-/* Шапка: безопасная зона Telegram + всегда на виду */
-.app { padding-top: calc(16px + var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px)); }
-.top {
-  position: sticky; top: calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px));
-  z-index: 20; margin: 0 -16px 14px; padding: 10px 16px; background: var(--bg);
+.mascot-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
 }
 
-/* Истории: на весь экран, нижнее меню скрыто */
-body:has(.sv) .tabbar { display: none; }
-.sv-bars { top: calc(10px + max(env(safe-area-inset-top), var(--tg-safe-area-inset-top, 0px)) + var(--tg-content-safe-area-inset-top, 0px)); }
-.sv-head { top: calc(22px + max(env(safe-area-inset-top), var(--tg-safe-area-inset-top, 0px)) + var(--tg-content-safe-area-inset-top, 0px)); }
+.mascot-image {
+  object-fit: contain;
+  display: block;
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 8px 18px rgba(111, 79, 225, 0.12));
+}
+
+.mascot-fallback {
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+  background: rgba(142, 114, 255, 0.08);
+  line-height: 1;
+}
+
+.mascot-bubble {
+  position: relative;
+  max-width: 320px;
+  width: fit-content;
+  padding: 14px 18px;
+  border-radius: 20px;
+  background: var(--card, #ffffff);
+  color: var(--text, #171326);
+  border: 1px solid rgba(130, 110, 220, 0.12);
+  box-shadow: 0 8px 30px rgba(65, 45, 120, 0.06);
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 500;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.mascot-bubble::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  background: var(--card, #ffffff);
+  border-left: 1px solid rgba(130, 110, 220, 0.12);
+  border-top: 1px solid rgba(130, 110, 220, 0.12);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.mascot-compact {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  text-align: left;
+}
+
+.mascot-compact .mascot-bubble {
+  text-align: left;
+  max-width: none;
+  flex: 1;
+}
+
+.mascot-compact .mascot-bubble::before {
+  top: 50%;
+  left: -7px;
+  transform: translateY(-50%) rotate(-45deg);
+}
+
+/* ---------- MASCOT ANIMATIONS ---------- */
+
+@keyframes mascot-float {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes mascot-glow {
+  0% {
+    filter: drop-shadow(0 4px 10px rgba(125, 95, 240, 0.08));
+  }
+
+  50% {
+    filter: drop-shadow(0 10px 22px rgba(125, 95, 240, 0.2));
+  }
+
+  100% {
+    filter: drop-shadow(0 4px 10px rgba(125, 95, 240, 0.08));
+  }
+}
+
+.mascot-guide:not(.mascot-compact) .mascot-image {
+  animation: mascot-glow 4s ease-in-out infinite;
+}
+
+/* ---------- TOAST NOTIFICATIONS ---------- */
+
+.toast-container {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 16px);
+  left: 0;
+  right: 0;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 16px;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  max-width: min(420px, 100%);
+  min-width: 180px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: var(--card, #ffffff);
+  color: var(--text, #171326);
+  border: 1px solid rgba(130, 110, 220, 0.14);
+  box-shadow: 0 12px 36px rgba(40, 25, 90, 0.14);
+  box-sizing: border-box;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.toast-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.toast-message {
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+/* ---------- TOAST TYPES ---------- */
+
+.toast-success .toast-icon {
+  background: rgba(46, 204, 113, 0.14);
+  color: #20a65a;
+}
+
+.toast-info .toast-icon {
+  background: rgba(130, 100, 240, 0.14);
+  color: #8062e8;
+}
+
+.toast-error .toast-icon {
+  background: rgba(255, 77, 77, 0.14);
+  color: #e54848;
+}
+
+/* ---------- DARK THEME ---------- */
+
+[data-theme="dark"] .mascot-bubble {
+  background: var(--card, #151122);
+  color: var(--text, #f4f0ff);
+  border-color: rgba(160, 130, 255, 0.16);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22);
+}
+
+[data-theme="dark"] .mascot-bubble::before {
+  background: var(--card, #151122);
+  border-color: rgba(160, 130, 255, 0.16);
+}
+
+[data-theme="dark"] .mascot-fallback {
+  background: rgba(142, 114, 255, 0.12);
+}
+
+[data-theme="dark"] .toast {
+  background: rgba(21, 17, 34, 0.94);
+  color: #f4f0ff;
+  border-color: rgba(160, 130, 255, 0.16);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 480px) {
+  .mascot-guide {
+    gap: 10px;
+  }
+
+  .mascot-bubble {
+    max-width: 280px;
+    padding: 12px 15px;
+    font-size: 13px;
+    border-radius: 17px;
+  }
+
+  .mascot-compact {
+    gap: 10px;
+  }
+
+  .toast-container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .toast {
+    max-width: 100%;
+    padding: 12px 15px;
+    border-radius: 16px;
+  }
+
+  .toast-message {
+    font-size: 13px;
+  }
+}
+
+/* ---------- ACCESSIBILITY ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot-guide:not(.mascot-compact) .mascot-image {
+    animation: none;
+  }
+}
