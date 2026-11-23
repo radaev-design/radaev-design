@@ -1,54 +1,48 @@
-
-import { BRAND, SERVICES, formatPrice } from '../../../config/catalog';
-import { haptic } from '../../integrations/telegram';
+import { useMemo } from 'react';
+import { BRAND, formatPrice, SERVICES } from '../../../config/catalog';
+import { haptic, openLink } from '../../integrations/telegram';
 import { useCart } from '../../storage/cart';
-import { openLink } from '../../ui/utils';
+import { Button } from '../../ui/Button';
+import { Mascot } from '../../ui/Mascot';
 import { useToast } from '../../ui/Toast';
 
 export function OrdersScreen({ onCatalog }: { onCatalog: () => void }) {
   const { ids, remove, clear } = useCart();
   const { toast } = useToast();
 
-  const items = ids
-    .map((id) => SERVICES.find((s) => s.id === id))
-    .filter(Boolean) as typeof SERVICES;
+  const items = useMemo(
+    () =>
+      ids.flatMap((id) => {
+        const s = SERVICES.find((x) => x.id === id);
+        return s ? [s] : [];
+      }),
+    [ids],
+  );
 
   if (!items.length) {
     return (
       <div className="screen empty">
-        <div className="ico">🛍️</div>
-
+        <Mascot pose="think" size={130} />
         <h2>Пока пусто</h2>
-
-        <p>
-          Выберите услугу в каталоге, и она появится здесь.
-        </p>
-
-        <button
-          className="btn"
+        <p>Выберите услугу в каталоге, и она появится здесь.</p>
+        <Button
           onClick={() => {
             haptic();
             onCatalog();
           }}
         >
           Перейти в каталог
-        </button>
+        </Button>
       </div>
     );
   }
 
-  const text =
-    'Здравствуйте! Хочу заказать:\n' +
-    items.map((s, i) => `${i + 1}. ${s.title}`).join('\n');
+  const text = 'Здравствуйте! Хочу заказать:\n' + items.map((s, i) => `${i + 1}. ${s.title}`).join('\n');
 
   return (
     <div className="screen">
       <h1>Заказы</h1>
-
-      <p className="muted">
-        Выбранные услуги. Сейчас заявка отправляется менеджеру
-        в Telegram, стоимость и оплату согласуете в чате.
-      </p>
+      <p className="muted">Заявка отправляется менеджеру в Telegram, стоимость и оплату согласуете в чате.</p>
 
       {items.map((s) => (
         <div key={s.id} className="card svc row">
@@ -56,7 +50,6 @@ export function OrdersScreen({ onCatalog }: { onCatalog: () => void }) {
             <h3>{s.title}</h3>
             <div className="price">{formatPrice(s)}</div>
           </div>
-
           <button
             className="x"
             aria-label="Убрать"
@@ -71,24 +64,21 @@ export function OrdersScreen({ onCatalog }: { onCatalog: () => void }) {
         </div>
       ))}
 
-      <button
-        className="btn svc-btn"
-        style={{ width: '100%' }}
+      <Button
+        block
+        className="svc-btn"
         onClick={() => {
           haptic('medium');
           toast('Открываем менеджера в Telegram', 'info');
-
-          openLink(
-            `${BRAND.managerUrl}?text=${encodeURIComponent(text)}`
-          );
+          openLink(`${BRAND.managerUrl}?text=${encodeURIComponent(text)}`);
         }}
       >
         Отправить менеджеру
-      </button>
-
-      <button
-        className="btn secondary svc-btn"
-        style={{ width: '100%', marginTop: 10 }}
+      </Button>
+      <Button
+        block
+        variant="secondary"
+        className="svc-btn"
         onClick={() => {
           haptic();
           clear();
@@ -96,7 +86,7 @@ export function OrdersScreen({ onCatalog }: { onCatalog: () => void }) {
         }}
       >
         Очистить
-      </button>
+      </Button>
     </div>
   );
 }
