@@ -29,6 +29,8 @@ export function systemTheme(): 'light' | 'dark' {
   return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
+export const startParam = () => WebApp.initDataUnsafe?.start_param;
+
 export interface TgUser {
   id?: number;
   firstName: string;
@@ -41,7 +43,7 @@ export function getUser(): TgUser {
   return { id: u?.id, firstName: u?.first_name || 'Гость', username: u?.username, photoUrl: u?.photo_url };
 }
 
-// Для серверной проверки подписи (этап 7).
+// Для серверной проверки подписи.
 export const getInitData = () => WebApp.initData || '';
 
 export function haptic(style: 'light' | 'medium' = 'light') {
