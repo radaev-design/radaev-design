@@ -1,0 +1,136 @@
+:root {
+  --blue: #153cff;
+  --deep: #0a1b66;
+  --bg: #f4f8fc;
+  --white: #fff;
+  --black: #080a12;
+  --accent: #ff5b4d;
+  --muted: #6b7390;
+  --radius: 24px;
+  --shadow: 0 10px 30px rgba(10, 27, 102, 0.1);
+  --tabbar-h: 76px;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body, #root { margin: 0; min-height: 100%; background: var(--bg); }
+body {
+  font-family: -apple-system, 'SF Pro Display', 'Inter', 'Segoe UI', Roboto, sans-serif;
+  color: var(--black);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; border: 0; cursor: pointer; }
+
+.app { max-width: 520px; margin: 0 auto; padding: 16px 16px calc(var(--tabbar-h) + 28px + env(safe-area-inset-bottom)); }
+.screen { animation: fade 0.35s ease both; }
+@keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* Top bar */
+.top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.logo { font-weight: 800; letter-spacing: 0.04em; font-size: 15px; color: var(--deep); }
+.logo b { color: var(--blue); }
+.hello { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.avatar {
+  width: 44px; height: 44px; border-radius: 50%; background: var(--blue) center/cover;
+  color: #fff; display: grid; place-items: center; font-weight: 700; box-shadow: var(--shadow);
+}
+
+h1 { font-size: 30px; line-height: 1.08; margin: 0 0 8px; letter-spacing: -0.02em; }
+h2 { font-size: 20px; margin: 26px 0 12px; letter-spacing: -0.01em; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 52px; padding: 0 24px; border-radius: 18px; font-weight: 700; font-size: 16px;
+  background: var(--accent); color: #fff; box-shadow: 0 8px 20px rgba(255, 91, 77, 0.35);
+  transition: transform 0.15s, opacity 0.15s;
+}
+.btn:active { transform: scale(0.96); }
+.btn:disabled { opacity: 0.5; }
+.btn.secondary { background: var(--white); color: var(--blue); box-shadow: var(--shadow); }
+
+/* Hero */
+.hero {
+  position: relative; overflow: hidden; border-radius: 32px; padding: 26px 22px 24px;
+  min-height: 330px; color: #fff;
+  background: radial-gradient(circle at 80% 10%, #3f66ff 0%, var(--blue) 45%, var(--deep) 100%);
+  box-shadow: 0 20px 40px rgba(21, 60, 255, 0.3);
+}
+.hero p { margin: 0 0 20px; max-width: 220px; opacity: 0.85; font-size: 15px; line-height: 1.4; }
+.hero h1 { max-width: 230px; }
+.hero .btn { position: relative; z-index: 2; }
+
+/* CSS 3D objects */
+.obj { position: absolute; animation: float 6s ease-in-out infinite; }
+@keyframes float { 50% { transform: translateY(-12px) rotate(4deg); } }
+.sphere {
+  width: 110px; height: 110px; border-radius: 50%; right: 18px; top: 28px;
+  background: radial-gradient(circle at 30% 28%, #ffb0a8, var(--accent) 55%, #b32a1f);
+  box-shadow: 0 18px 30px rgba(0, 0, 0, 0.3);
+}
+.cube {
+  width: 86px; height: 86px; border-radius: 22px; right: 70px; top: 150px; animation-delay: -2s;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.1));
+  border: 1px solid rgba(255, 255, 255, 0.5); backdrop-filter: blur(8px);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.25); transform: rotate(14deg);
+}
+.ring {
+  width: 74px; height: 74px; border-radius: 50%; right: 14px; top: 200px; animation-delay: -4s;
+  border: 14px solid #fff; box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.2), 0 12px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* Cards */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cat {
+  position: relative; overflow: hidden; border-radius: var(--radius); padding: 16px; min-height: 120px;
+  color: #fff; text-align: left; display: flex; flex-direction: column; justify-content: flex-end;
+  box-shadow: var(--shadow); transition: transform 0.15s;
+}
+.cat:active { transform: scale(0.97); }
+.cat::after {
+  content: ''; position: absolute; width: 90px; height: 90px; border-radius: 50%; right: -20px; top: -20px;
+  background: rgba(255, 255, 255, 0.18);
+}
+.cat b { font-size: 17px; }
+.cat span { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+
+.card { background: var(--white); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
+.svc { margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px; }
+.svc h3 { margin: 0; font-size: 17px; }
+.svc p { margin: 0; color: var(--muted); font-size: 14px; }
+.price { font-size: 13px; font-weight: 700; color: var(--blue); }
+.badge {
+  align-self: flex-start; font-size: 11px; font-weight: 800; letter-spacing: 0.06em; padding: 4px 10px;
+  border-radius: 999px; background: var(--accent); color: #fff;
+}
+.badge.pop { background: #e8edff; color: var(--blue); }
+
+/* Chips */
+.chips { display: flex; gap: 8px; overflow-x: auto; margin: 0 -16px 16px; padding: 0 16px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none; height: 38px; padding: 0 16px; border-radius: 999px; background: var(--white);
+  color: var(--deep); font-weight: 600; box-shadow: var(--shadow);
+}
+.chip.on { background: var(--blue); color: #fff; }
+
+/* Empty */
+.empty { text-align: center; padding: 48px 16px; }
+.empty .ico { font-size: 56px; margin-bottom: 8px; }
+.empty p { color: var(--muted); margin: 0 0 20px; }
+
+/* Tab bar */
+.tabbar {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(12px + env(safe-area-inset-bottom));
+  width: min(496px, calc(100% - 24px)); height: 64px; display: flex; padding: 6px;
+  border-radius: 26px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(18px);
+  box-shadow: 0 12px 32px rgba(10, 27, 102, 0.18); z-index: 10;
+}
+.tab {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  background: none; color: var(--muted); font-size: 11px; font-weight: 600; border-radius: 20px; transition: all 0.2s;
+}
+.tab svg { width: 22px; height: 22px; }
+.tab.on { background: var(--blue); color: #fff; }
+
+.skeleton { background: linear-gradient(90deg, #e6edf7 25%, #f4f8fc 50%, #e6edf7 75%); background-size: 200% 100%; animation: sk 1.2s infinite; border-radius: 16px; }
+@keyframes sk { to { background-position: -200% 0; } }
