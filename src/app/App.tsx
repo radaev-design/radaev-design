@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import type { CategoryId } from '../../config/catalog';
-import { setTelegramColors, systemTheme } from '../integrations/telegram';
+import { setTelegramColors, startParam, systemTheme } from '../integrations/telegram';
 import { CatalogScreen } from '../modules/catalog/CatalogScreen';
 import { HomeScreen } from '../modules/home/HomeScreen';
 import { OrdersScreen } from '../modules/orders/OrdersScreen';
@@ -16,11 +16,11 @@ import { Tab, TABS } from './tabs';
 
 type Theme = 'light' | 'dark';
 const TOUR_KEY = 'modo_onboarding_done';
-const BG: Record<Theme, string> = { light: '#f4f8fc', dark: '#0b0e1a' };
+const BG: Record<Theme, string> = { light: '#eff8ff', dark: '#0d0303' };
 
 function Shell() {
   const [splash, setSplash] = useState(true);
-  const [tab, setTab] = useState<Tab>('home');
+  const [tab, setTab] = useState<Tab>(startParam() === 'orders' ? 'orders' : 'home');
   const [settings, setSettings] = useState(false);
   const [cat, setCat] = useState<CategoryId | undefined>();
   const [step, setStep] = useState<number | null>(null);
@@ -36,7 +36,7 @@ function Shell() {
   useEffect(() => {
     const t = setTimeout(() => {
       setSplash(false);
-      if (!read(TOUR_KEY, false)) setStep(0);
+      if (!read(TOUR_KEY, false) && startParam() !== 'orders') setStep(0);
     }, 2000);
     return () => clearTimeout(t);
   }, []);
