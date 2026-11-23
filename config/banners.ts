@@ -1,115 +1,92 @@
-import { useEffect, useRef, useState } from 'react';
-import { BANNERS } from '../../../config/banners';
-import type { CategoryId } from '../../../config/catalog';
-import { haptic } from '../../integrations/telegram';
-import './Banners.css';
+// Баннеры главной. Меняйте тексты здесь.
+// discount: '' -> большая цифра скидки не показывается. Впишите, например, '−15%', когда определитесь.
+// story: true  -> баннер-история клиента. isExample: true -> показывается пометка «Пример».
+import type { CategoryId } from './catalog';
 
-interface Props {
-  onOpen: (cat?: CategoryId) => void;
+export interface Banner {
+  id: string;
+  tag: string;
+  title: string;
+  text: string;
+  discount?: string;
+  cta: string;
+  category: CategoryId;
+  from: string; // цвет градиента (начало)
+  to: string; // цвет градиента (конец)
+  story?: boolean;
+  quote?: string;
+  author?: string;
+  isExample?: boolean;
 }
 
-const INTERVAL = 5000;
-
-export function Banners({ onOpen }: Props) {
-  const ref = useRef<HTMLDivElement>(null);
-  const idx = useRef(0);
-  const paused = useRef(false);
-  const timer = useRef<number>();
-  const [active, setActive] = useState(0);
-
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      const el = ref.current;
-      if (!el || paused.current) return;
-      const next = (idx.current + 1) % BANNERS.length;
-      el.scrollTo({ left: next * el.clientWidth, behavior: 'smooth' });
-    }, INTERVAL);
-    return () => window.clearInterval(id);
-  }, []);
-
-  const onScroll = () => {
-    const el = ref.current;
-    if (!el) return;
-    const i = Math.round(el.scrollLeft / el.clientWidth);
-    if (i !== idx.current) {
-      idx.current = i;
-      setActive(i);
-    }
-  };
-
-  const pause = () => {
-    paused.current = true;
-    window.clearTimeout(timer.current);
-  };
-  const resume = () => {
-    window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => (paused.current = false), 4000);
-  };
-
-  const goTo = (i: number) => {
-    const el = ref.current;
-    if (el) el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' });
-  };
-
-  return (
-    <section className="bn" aria-label="Специальные предложения">
-      <div
-        className="bn-track"
-        ref={ref}
-        onScroll={onScroll}
-        onTouchStart={pause}
-        onTouchEnd={resume}
-        onMouseEnter={pause}
-        onMouseLeave={resume}
-      >
-        {BANNERS.map((b) => (
-          <div className="bn-slide" key={b.id}>
-            <div className="bn-card" style={{ background: `linear-gradient(135deg, ${b.from}, ${b.to})` }}>
-              <i className="bn-bubble" />
-              <span className="bn-tag">{b.tag}</span>
-
-              {b.story ? (
-                <>
-                  <div className="bn-story">
-                    <div className="bn-photos" aria-hidden="true">
-                      <div className="bn-ph">до</div>
-                      <div className="bn-ph after">после</div>
-                    </div>
-                    <div>
-                      <p className="bn-quote">«{b.quote}»</p>
-                      <div className="bn-author">
-                        {b.author}
-                        {b.isExample && <em> · пример отзыва</em>}
-                      </div>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  {b.discount ? <div className="bn-disc">{b.discount}</div> : null}
-                  <h3 className="bn-title">{b.title}</h3>
-                  <p className="bn-text">{b.text}</p>
-                </>
-              )}
-
-              <button
-                className="bn-btn"
-                onClick={() => {
-                  haptic('light');
-                  onOpen(b.category);
-                }}
-              >
-                {b.cta}
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="bn-dots">
-        {BANNERS.map((b, i) => (
-          <button key={b.id} className={i === active ? 'on' : ''} aria-label={`Баннер ${i + 1}`} onClick={() => goTo(i)} />
-        ))}
-      </div>
-    </section>
-  );
-}
+export const BANNERS: Banner[] = [
+  {
+    id: 'first-order',
+    tag: 'Скидка на первый заказ',
+    title: 'Логотип и фирменный стиль',
+    text: 'Новым клиентам — приятный бонус на первый заказ.',
+    discount: '',
+    cta: 'Заказать дизайн',
+    category: 'design',
+    from: '#3f66ff',
+    to: '#0a1b66',
+  },
+  {
+    id: 'ai-story',
+    tag: 'История клиента',
+    title: 'Нейро-фотосессия',
+    text: '',
+    cta: 'Заказать нейро-фотосессию',
+    category: 'ai-photo',
+    from: '#7a4dff',
+    to: '#2a1a80',
+    story: true,
+    quote:
+      'Загрузила несколько обычных фото, а получила целую серию кадров как со студийной съёмки. Теперь это мои аватарки и контент для соцсетей!',
+    author: 'Анна, клиентка',
+    isExample: true,
+  },
+  {
+    id: 'reels',
+    tag: 'Акция',
+    title: 'Монтаж Reels и Shorts',
+    text: 'Динамичный монтаж, который удерживает внимание.',
+    discount: '',
+    cta: 'Заказать монтаж',
+    category: 'video',
+    from: '#ff7a6b',
+    to: '#c2362a',
+  },
+  {
+    id: 'bot',
+    tag: 'Специальное предложение',
+    title: 'Telegram-бот под ключ',
+    text: 'Автоматизируйте заявки и продажи прямо в Telegram.',
+    discount: '',
+    cta: 'Заказать бота',
+    category: 'telegram',
+    from: '#153cff',
+    to: '#080a12',
+  },
+  {
+    id: 'marketplace',
+    tag: 'Для продавцов',
+    title: 'Карточки для маркетплейсов',
+    text: 'Инфографика, которая повышает конверсию.',
+    discount: '',
+    cta: 'Заказать карточки',
+    category: 'design',
+    from: '#1fb6a6',
+    to: '#0a4a66',
+  },
+  {
+    id: 'preorder',
+    tag: 'Скоро',
+    title: 'Mini Apps и виджеты',
+    text: 'Оформите предзаказ и расскажите о своей идее первыми.',
+    cta: 'Смотреть',
+    category: 'telegram',
+    from: '#0a1b66',
+    to: '#7a4dff',
+  },
+];
