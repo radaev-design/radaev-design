@@ -1,0 +1,47 @@
+.bn { margin-top: 20px; }
+.bn-track {
+  display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+  margin: 0 -6px; overscroll-behavior-x: contain;
+}
+.bn-track::-webkit-scrollbar { display: none; }
+.bn-slide { flex: 0 0 100%; scroll-snap-align: start; padding: 0 6px; }
+.bn-card {
+  position: relative; overflow: hidden; border-radius: 28px; padding: 18px; min-height: 210px;
+  color: #fff; display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+  box-shadow: 0 14px 30px rgba(10, 27, 102, 0.22);
+}
+.bn-bubble {
+  position: absolute; right: -40px; top: -40px; width: 150px; height: 150px; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14); pointer-events: none;
+}
+.bn-tag {
+  position: relative; font-size: 11px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+  padding: 5px 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(6px);
+}
+.bn-disc { position: relative; font-size: 40px; font-weight: 800; line-height: 1; letter-spacing: -0.02em; }
+.bn-title { position: relative; margin: 0; font-size: 22px; line-height: 1.12; max-width: 230px; letter-spacing: -0.01em; }
+.bn-text { position: relative; margin: 0; font-size: 14px; line-height: 1.35; opacity: 0.88; max-width: 240px; flex: 1; }
+.bn-btn {
+  position: relative; margin-top: auto; height: 42px; padding: 0 20px; border-radius: 14px;
+  background: #fff; color: var(--deep); font-weight: 700; font-size: 14px; transition: transform 0.15s;
+}
+.bn-btn:active { transform: scale(0.96); }
+
+/* Story */
+.bn-story { position: relative; display: flex; gap: 12px; align-items: flex-start; flex: 1; }
+.bn-photos { display: flex; flex-direction: column; gap: 6px; flex: none; }
+.bn-ph {
+  width: 64px; height: 64px; border-radius: 16px; display: grid; place-items: center; font-size: 11px;
+  font-weight: 700; background: rgba(255, 255, 255, 0.15); border: 1px dashed rgba(255, 255, 255, 0.5);
+}
+.bn-ph.after { background: rgba(255, 255, 255, 0.3); }
+.bn-quote { margin: 0 0 6px; font-size: 13px; line-height: 1.35; }
+.bn-author { font-size: 12px; font-weight: 700; opacity: 0.9; }
+.bn-author em { font-weight: 500; opacity: 0.75; }
+
+/* Dots */
+.bn-dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
+.bn-dots button {
+  width: 7px; height: 7px; padding: 0; border-radius: 999px; background: #c5cde0; transition: all 0.25s;
+}
+.bn-dots button.on { width: 22px; background: var(--blue); }
