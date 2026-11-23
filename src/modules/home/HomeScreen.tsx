@@ -1,6 +1,7 @@
 import { CATEGORIES, CategoryId } from '../../../config/catalog';
 import { ru } from '../../i18n/ru';
 import { getUser } from '../../integrations/telegram';
+import { Banners } from './Banners';
 
 interface Props {
   onOpenCatalog: (cat?: CategoryId) => void;
@@ -40,6 +41,8 @@ export function HomeScreen({ onOpenCatalog, onOpenProfile }: Props) {
           {ru.home.cta}
         </button>
       </section>
+
+      <Banners onOpen={onOpenCatalog} />
 
       <h2>{ru.home.categories}</h2>
       <div className="grid2">
