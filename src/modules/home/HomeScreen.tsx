@@ -2,7 +2,6 @@
 import { CATEGORIES, CategoryId } from '../../../config/catalog';
 import { ru } from '../../i18n/ru';
 import { getUser } from '../../integrations/telegram';
-import { MascotGuide } from '../../ui/MascotGuide';
 import { Banners } from './Banners';
 import { Stories } from './Stories';
 
@@ -13,12 +12,10 @@ interface Props {
 
 export function HomeScreen({ onOpenCatalog, onOpenProfile }: Props) {
   const user = getUser();
-
   const firstName = user.firstName || 'друг';
 
   return (
     <div className="screen">
-      {/* ШАПКА */}
       <header className="top">
         <div>
           <div className="logo">
@@ -40,45 +37,27 @@ export function HomeScreen({ onOpenCatalog, onOpenProfile }: Props) {
               : undefined
           }
         >
-          {user.photoUrl ? '' : firstName[0].toUpperCase()}
+          {user.photoUrl ? '' : firstName[0]}
         </button>
       </header>
 
-      {/* STORIES */}
       <Stories />
 
-      {/* ПРИВЕТСТВИЕ МАСКОТА */}
-      <div className="home-mascot">
-        <MascotGuide
-          pose="hello"
-          size={112}
-          compact
-          text={`Привет, ${firstName}! Давай сделаем твой проект ещё красивее ✨`}
-        />
-      </div>
-
-      {/* HERO */}
       <section className="hero">
         <div className="obj sphere" />
         <div className="obj cube" />
         <div className="obj ring" />
 
         <h1>{ru.home.heroTitle}</h1>
-
         <p>{ru.home.heroSub}</p>
 
-        <button
-          className="btn"
-          onClick={() => onOpenCatalog()}
-        >
+        <button className="btn" onClick={() => onOpenCatalog()}>
           {ru.home.cta}
         </button>
       </section>
 
-      {/* БАННЕРЫ */}
       <Banners onOpen={onOpenCatalog} />
 
-      {/* КАТЕГОРИИ */}
       <h2>{ru.home.categories}</h2>
 
       <div className="grid2">
@@ -97,5 +76,3 @@ export function HomeScreen({ onOpenCatalog, onOpenProfile }: Props) {
     </div>
   );
 }
-
-export default HomeScreen;
