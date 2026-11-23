@@ -10,6 +10,7 @@ import { SettingsScreen } from '../modules/profile/SettingsScreen';
 import { CartProvider, useCart } from '../storage/cart';
 import { Splash } from '../ui/Splash';
 import './extra.css';
+import './mascot-theme.css';
 
 type Tab = 'home' | 'catalog' | 'orders' | 'profile';
 const svg = (c: ReactNode) => (
@@ -24,7 +25,7 @@ const TABS: { id: Tab; label: string; icon: ReactNode }[] = [
 
 function applyTheme(dark: boolean) {
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-  const bg = dark ? '#0b0e1a' : '#F4F8FC';
+  const bg = dark ? '#05030F' : '#F3F1FF';
   try { WebApp.setHeaderColor(bg as any); WebApp.setBackgroundColor(bg as any); } catch { /* вне Telegram */ }
 }
 
