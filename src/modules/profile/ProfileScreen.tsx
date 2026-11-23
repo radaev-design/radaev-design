@@ -5,7 +5,6 @@ import { getUser, haptic } from '../../integrations/telegram';
 import { useCart } from '../../storage/cart';
 import { openLink } from '../../ui/utils';
 import { useToast } from '../../ui/Toast';
-import { MascotGuide } from '../../ui/MascotGuide';
 
 interface Props {
   onOrders: () => void;
@@ -20,9 +19,9 @@ export function ProfileScreen({ onOrders, onSettings }: Props) {
   const firstName = u.firstName || 'Пользователь';
 
   const share = `https://t.me/share/url?url=${encodeURIComponent(
-    'https://t.me/' + BRAND.clientBot,
+    'https://t.me/' + BRAND.clientBot
   )}&text=${encodeURIComponent(
-    'Студия RADAEV.DESIGN: дизайн, видео, AI-фото и Telegram-боты',
+    'Студия RADAEV.DESIGN: дизайн, видео, AI-фото и Telegram-боты'
   )}`;
 
   const items: {
@@ -68,7 +67,6 @@ export function ProfileScreen({ onOrders, onSettings }: Props) {
       ico: '💬',
       t: 'Написать менеджеру',
       on: () => {
-        haptic('medium');
         toast('Открываем менеджера в Telegram', 'info');
         openLink(BRAND.managerUrl);
       },
@@ -76,10 +74,7 @@ export function ProfileScreen({ onOrders, onSettings }: Props) {
     {
       ico: '🎁',
       t: 'Пригласить друга',
-      on: () => {
-        haptic();
-        openLink(share);
-      },
+      on: () => openLink(share),
     },
     {
       ico: '⚙️',
@@ -90,13 +85,6 @@ export function ProfileScreen({ onOrders, onSettings }: Props) {
 
   return (
     <div className="screen">
-      <MascotGuide
-        pose="hello"
-        size={100}
-        compact
-        text={`Привет, ${firstName}! Здесь всё управление твоим аккаунтом.`}
-      />
-
       <div className="card pf">
         <div
           className="avatar big"
