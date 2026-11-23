@@ -1,35 +1,39 @@
 import { useState } from 'react';
-import { CATEGORIES, CategoryId, activeServices, formatPrice } from '../../../config/catalog';
-import { ru } from '../../i18n/ru';
+import { activeServices, CATEGORIES, CategoryId, formatPrice, BRAND } from '../../../config/catalog';
+import { haptic } from '../../integrations/telegram';
+import { useCart } from '../../storage/cart';
+import { fly, openLink } from '../../ui/utils';
 
 export function CatalogScreen({ initial }: { initial?: CategoryId }) {
-  const [cat, setCat] = useState<CategoryId | 'all'>(initial ?? 'all');
-  const list = activeServices().filter((s) => cat === 'all' || s.category === cat);
-
+  const [cat, setCat] = useState<CategoryId | undefined>(initial);
+  const { has, add, remove } = useCart();
+  const list = activeServices().filter((s) => !cat || s.category === cat);
   return (
     <div className="screen">
-      <h1>{ru.catalog.title}</h1>
+      <h1>Услуги</h1>
       <div className="chips">
-        <button className={'chip' + (cat === 'all' ? ' on' : '')} onClick={() => setCat('all')}>
-          {ru.catalog.all}
-        </button>
+        <button className={'chip' + (!cat ? ' on' : '')} onClick={() => setCat(undefined)}>Все</button>
         {CATEGORIES.map((c) => (
-          <button key={c.id} className={'chip' + (cat === c.id ? ' on' : '')} onClick={() => setCat(c.id)}>
-            {c.title}
-          </button>
+          <button key={c.id} className={'chip' + (cat === c.id ? ' on' : '')} onClick={() => setCat(c.id)}>{c.title}</button>
         ))}
       </div>
-
-      {list.length === 0 && <p className="empty">{ru.catalog.empty}</p>}
-
       {list.map((s) => (
-        <article key={s.id} className="card svc">
-          {s.comingSoon && <span className="badge">{ru.catalog.soon}</span>}
+        <div key={s.id} className="card svc">
+          {s.comingSoon && <span className="badge">COMING SOON</span>}
           {s.popular && !s.comingSoon && <span className="badge pop">ПОПУЛЯРНО</span>}
           <h3>{s.title}</h3>
           <p>{s.description}</p>
           <div className="price">{formatPrice(s)}</div>
-        </article>
+          {s.comingSoon ? (
+            <button className="btn svc-btn secondary" onClick={() => openLink(`${BRAND.managerUrl}?text=${encodeURIComponent('Хочу оформить предзаказ: ' + s.title)}`)}>
+              Оформить предзаказ
+            </button>
+          ) : has(s.id) ? (
+            <button className="btn svc-btn secondary" onClick={() => { haptic(); remove(s.id); }}>✓ В заказе · убрать</button>
+          ) : (
+            <button className="btn svc-btn" onClick={(e) => { haptic('medium'); fly(e.currentTarget); add(s.id); }}>Заказать</button>
+          )}
+        </div>
       ))}
     </div>
   );
