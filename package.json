@@ -1,7 +1,7 @@
 {
   "name": "radaev-design",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,6 +10,8 @@
     "server": "tsx --env-file=.env server/index.ts"
   },
   "dependencies": {
+    "@fontsource-variable/onest": "^5.1.0",
+    "@fontsource-variable/unbounded": "^5.1.0",
     "@twa-dev/sdk": "^8.0.2",
     "framer-motion": "^11.11.0",
     "react": "^18.3.1",
