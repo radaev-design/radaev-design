@@ -3,7 +3,7 @@ import { activeServices, CATEGORIES, CategoryId } from '../../../config/catalog'
 import { Mascot } from '../../ui/Mascot';
 import { ServiceCard } from './ServiceCard';
 
-export function CatalogScreen({ initial }: { initial?: CategoryId }) {
+export function CatalogScreen({ initial, openId }: { initial?: CategoryId; openId?: string }) {
   const [cat, setCat] = useState<CategoryId | undefined>(initial);
   const list = activeServices().filter((s) => !cat || s.category === cat);
 
@@ -28,7 +28,7 @@ export function CatalogScreen({ initial }: { initial?: CategoryId }) {
           <p>В этой категории пока нет доступных услуг.</p>
         </div>
       ) : (
-        list.map((s, i) => <ServiceCard key={s.id} s={s} n={i + 1} />)
+        list.map((s, i) => <ServiceCard key={s.id} s={s} n={i + 1} autoOpen={s.id === openId} />)
       )}
     </div>
   );
