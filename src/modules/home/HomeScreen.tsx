@@ -3,13 +3,15 @@ import { ADVANTAGES, STEPS } from '../../../config/home';
 import { ru } from '../../i18n/ru';
 import { getUser } from '../../integrations/telegram';
 import { Button } from '../../ui/Button';
+import { HeroObjects } from '../../ui/HeroObjects';
+import { Marquee } from '../../ui/Marquee';
 import { Mascot } from '../../ui/Mascot';
 import { ServiceCard } from '../catalog/ServiceCard';
 import { Banners } from './Banners';
 import { Stories } from './Stories';
 
 interface Props {
-  onOpenCatalog: (cat?: CategoryId) => void;
+  onOpenCatalog: (cat?: CategoryId, svc?: string) => void;
   onOpenProfile: () => void;
 }
 
@@ -40,18 +42,18 @@ export function HomeScreen({ onOpenCatalog, onOpenProfile }: Props) {
         </button>
       </header>
 
-      <Stories />
+      <Stories onOpen={onOpenCatalog} />
 
       <section className="hero">
-        <div className="obj sphere" />
-        <div className="obj cube" />
-        <div className="obj ring" />
+        <HeroObjects />
         <h1>{ru.home.heroTitle}</h1>
         <p>{ru.home.heroSub}</p>
         <Button onClick={() => onOpenCatalog()}>{ru.home.cta}</Button>
       </section>
 
-      <Banners onOpen={onOpenCatalog} />
+      <Banners onOpen={(c) => onOpenCatalog(c)} />
+
+      <Marquee />
 
       <h2>{ru.home.categories}</h2>
       <div className="grid2">
