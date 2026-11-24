@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { STORIES } from '../../../config/stories';
+import type { CategoryId } from '../../../config/catalog';
+import { REACTIONS, STORIES } from '../../../config/stories';
 import { haptic } from '../../integrations/telegram';
 import { read, write } from '../../storage/ls';
+import { useMe } from '../../storage/me';
 import { asset } from '../../ui/utils';
 
-const EMOJI = ['🔥', '🎉', '🏆', '👏', '🥳', '❤️'];
+type Open = (cat?: CategoryId, svc?: string) => void;
 
 const avatarStyle = (s: (typeof STORIES)[number]) =>
   s.avatar ? { backgroundImage: `url(${asset(s.avatar)})` } : { background: s.color };
 
-export function Stories() {
+export function Stories({ onOpen }: { onOpen: Open }) {
   const [open, setOpen] = useState<number | null>(null);
   const [seen, setSeen] = useState<string[]>(() => read('seen', []));
 
@@ -38,21 +40,24 @@ export function Stories() {
           </button>
         ))}
       </div>
-      <AnimatePresence>{open !== null && <Viewer key="v" start={open} onSeen={mark} onClose={() => setOpen(null)} />}</AnimatePresence>
+      <AnimatePresence>
+        {open !== null && <Viewer key="v" start={open} onSeen={mark} onClose={() => setOpen(null)} onOpen={onOpen} />}
+      </AnimatePresence>
     </>
   );
 }
 
-function Viewer({ start, onSeen, onClose }: { start: number; onSeen: (id: string) => void; onClose: () => void }) {
+function Viewer({ start, onSeen, onClose, onOpen }: { start: number; onSeen: (id: string) => void; onClose: () => void; onOpen: Open }) {
+  const { reactions, react: sendReaction } = useMe();
   const [pos, setPos] = useState({ s: start, i: 0 });
   const [p, setP] = useState(0);
-  const [rx, setRx] = useState<Record<string, number>>(() => read('rx', {}));
-  const [fly, setFly] = useState<{ id: number; e: string; x: number }[]>([]);
+  const [floats, setFloats] = useState<{ id: number; e: string; x: number }[]>([]);
   const paused = useRef(false);
 
   const story = STORIES[pos.s];
   const slide = story.slides[pos.i];
   const dur = slide.duration ?? 5000;
+  const mine = reactions[story.id];
 
   const next = () => {
     setP(0);
@@ -87,13 +92,11 @@ function Viewer({ start, onSeen, onClose }: { start: number; onSeen: (id: string
     if (p >= 1) nextRef.current();
   }, [p]);
 
-  const react = (e: string) => {
+  const onReact = (e: string) => {
+    if (mine) return;
     haptic('medium');
-    const k = story.id + e;
-    const n = { ...rx, [k]: (rx[k] || 0) + 1 };
-    setRx(n);
-    write('rx', n);
-    setFly((f) => [...f, { id: Date.now() + Math.random(), e, x: Math.random() * 120 - 60 }]);
+    sendReaction(story.id, e);
+    setFloats((f) => [...f, { id: Date.now() + Math.random(), e, x: Math.random() * 120 - 60 }]);
   };
 
   const src = slide.src ? asset(slide.src) : '';
@@ -110,7 +113,7 @@ function Viewer({ start, onSeen, onClose }: { start: number; onSeen: (id: string
       dragElastic={{ top: 0, bottom: 0.7 }}
       onDragEnd={(_, i) => i.offset.y > 120 && onClose()}
     >
-      <div className="sv-bg" style={{ background: `linear-gradient(160deg, ${story.color}, #080a12)` }}>
+      <div className="sv-bg" style={{ background: `linear-gradient(160deg, ${story.color}, #0d0303)` }}>
         {src && (isVideo ? <video key={src} src={src} autoPlay muted playsInline loop /> : <img key={src} src={src} alt="" />)}
       </div>
       <div className="sv-bars">
@@ -139,24 +142,38 @@ function Viewer({ start, onSeen, onClose }: { start: number; onSeen: (id: string
         <div onClick={next} />
       </div>
       {slide.caption && <div className="sv-cap">{slide.caption}</div>}
+
+      {slide.cta && (
+        <button
+          className="sv-cta"
+          onClick={() => {
+            haptic('medium');
+            const c = slide.cta!;
+            onClose();
+            onOpen(c.category, c.service);
+          }}
+        >
+          {slide.cta.label}
+        </button>
+      )}
+
       <div className="sv-fly">
-        {fly.map((f) => (
+        {floats.map((f) => (
           <motion.span
             key={f.id}
             initial={{ y: 0, x: f.x, opacity: 1, scale: 0.6 }}
             animate={{ y: -280, opacity: 0, scale: 1.7 }}
             transition={{ duration: 1.3, ease: 'easeOut' }}
-            onAnimationComplete={() => setFly((l) => l.filter((z) => z.id !== f.id))}
+            onAnimationComplete={() => setFloats((l) => l.filter((z) => z.id !== f.id))}
           >
             {f.e}
           </motion.span>
         ))}
       </div>
       <div className="sv-rx">
-        {EMOJI.map((e) => (
-          <button key={e} onClick={() => react(e)}>
+        {REACTIONS.map((e) => (
+          <button key={e} className={mine === e ? 'on' : ''} disabled={!!mine && mine !== e} onClick={() => onReact(e)}>
             {e}
-            {rx[story.id + e] ? <small>{rx[story.id + e]}</small> : null}
           </button>
         ))}
       </div>
