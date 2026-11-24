@@ -2,17 +2,21 @@ import { BRAND } from '../../../config/catalog';
 import { LINKS } from '../../../config/links';
 import { getUser, haptic, openLink } from '../../integrations/telegram';
 import { useCart } from '../../storage/cart';
+import { useMe } from '../../storage/me';
 import { MenuItem } from '../../ui/MenuItem';
 import { useToast } from '../../ui/Toast';
+import { PromoCard } from './PromoCard';
 
 interface Props {
   onOrders: () => void;
   onSettings: () => void;
+  onGames: () => void;
 }
 
-export function ProfileScreen({ onOrders, onSettings }: Props) {
+export function ProfileScreen({ onOrders, onSettings, onGames }: Props) {
   const u = getUser();
   const { ids } = useCart();
+  const { me } = useMe();
   const { toast } = useToast();
 
   const share =
@@ -42,8 +46,11 @@ export function ProfileScreen({ onOrders, onSettings }: Props) {
         </div>
       </div>
 
+      <PromoCard />
+
       <div className="menu">
         <MenuItem ico="🛍️" title="Мои заказы" sub={ids.length ? `Выбрано: ${ids.length}` : undefined} onClick={run(onOrders)} />
+        <MenuItem ico="🎮" title="Игры и баллы" sub={me ? `${me.points} баллов` : 'Играйте и получайте скидки'} onClick={run(onGames)} />
         {links.map((l) => (
           <MenuItem key={l.t} ico={l.ico} title={l.t} onClick={run(() => openLink(l.url))} />
         ))}
