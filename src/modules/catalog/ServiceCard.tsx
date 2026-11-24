@@ -1,21 +1,29 @@
-import { BRAND, formatPrice, Service } from '../../../config/catalog';
-import { haptic, openLink } from '../../integrations/telegram';
-import { useCart } from '../../storage/cart';
-import { Button } from '../../ui/Button';
-import { useToast } from '../../ui/Toast';
-import { fly } from '../../ui/utils';
+import { useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
+import { formatPrice, Service } from '../../../config/catalog';
+import { ServiceAction } from './ServiceAction';
+import { ServiceSheet } from './ServiceSheet';
 
-export function ServiceCard({ s, n, className = '' }: { s: Service; n?: number; className?: string }) {
-  const { has, add, remove } = useCart();
-  const { toast } = useToast();
+interface Props {
+  s: Service;
+  n?: number;
+  className?: string;
+  autoOpen?: boolean;
+}
+
+export function ServiceCard({ s, n, className = '', autoOpen }: Props) {
+  const [open, setOpen] = useState(!!autoOpen);
   const badge = s.badge ?? (s.comingSoon ? 'скоро' : s.popular ? 'хит' : undefined);
 
   return (
     <div className={'sc ' + className}>
-      <div className="sc-main">
+      <div className="sc-main" role="button" tabIndex={0} onClick={() => setOpen(true)} onKeyDown={(e) => e.key === 'Enter' && setOpen(true)}>
         <div className="sc-top">
           <span className="sc-num">{String(n ?? 0).padStart(2, '0')}</span>
-          {badge && <span className="sc-badge">{badge}</span>}
+          <span className="sc-top-r">
+            {badge && <span className="sc-badge">{badge}</span>}
+            <span className="sc-more">подробнее ›</span>
+          </span>
         </div>
         <h3 className="sc-title">{s.title}</h3>
         <p className="sc-desc">{s.description}</p>
@@ -25,44 +33,10 @@ export function ServiceCard({ s, n, className = '' }: { s: Service; n?: number; 
       <div className="sc-foot">
         {s.slogan && <div className="sc-slogan">{s.slogan}</div>}
         {s.hint && <div className="sc-hint">{s.hint}</div>}
-        {s.comingSoon ? (
-          <Button
-            variant="secondary"
-            className="sc-btn"
-            onClick={() => {
-              haptic('medium');
-              toast('Открываем менеджера для предзаказа', 'info');
-              openLink(`${BRAND.managerUrl}?text=${encodeURIComponent('Хочу оформить предзаказ: ' + s.title)}`);
-            }}
-          >
-            предзаказ
-          </Button>
-        ) : has(s.id) ? (
-          <Button
-            variant="secondary"
-            className="sc-btn"
-            onClick={() => {
-              haptic();
-              remove(s.id);
-              toast('Услуга удалена из заказа', 'info');
-            }}
-          >
-            ✓ в заказе · убрать
-          </Button>
-        ) : (
-          <Button
-            className="sc-btn"
-            onClick={(e) => {
-              haptic('medium');
-              fly(e.currentTarget);
-              add(s.id);
-              toast('Услуга добавлена в заказ', 'success');
-            }}
-          >
-            беру
-          </Button>
-        )}
+        <ServiceAction s={s} />
       </div>
+
+      <AnimatePresence>{open && <ServiceSheet s={s} onClose={() => setOpen(false)} />}</AnimatePresence>
     </div>
   );
 }
