@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BRAND, SERVICES } from '../../../config/catalog';
+import { calcDiscount, ECONOMY } from '../../../config/economy';
 import { api, Order } from '../../api';
 import { haptic, openLink } from '../../integrations/telegram';
 import { useCart } from '../../storage/cart';
+import { useMe } from '../../storage/me';
 import { Button } from '../../ui/Button';
 import { Mascot } from '../../ui/Mascot';
 import { useToast } from '../../ui/Toast';
@@ -12,6 +14,7 @@ const rub = (n: number) => `${n.toLocaleString('ru-RU')} ${BRAND.currency}`;
 
 export function OrdersScreen({ onCatalog }: { onCatalog: () => void }) {
   const { ids, remove, clear } = useCart();
+  const { me, refresh } = useMe();
   const { toast } = useToast();
   const [orders, setOrders] = useState<Order[]>([]);
   const [comment, setComment] = useState('');
@@ -23,10 +26,15 @@ export function OrdersScreen({ onCatalog }: { onCatalog: () => void }) {
 
   useEffect(() => {
     load();
-    const v = () => document.visibilityState === 'visible' && load();
+    const v = () => {
+      if (document.visibilityState === 'visible') {
+        load();
+        refresh();
+      }
+    };
     document.addEventListener('visibilitychange', v);
     return () => document.removeEventListener('visibilitychange', v);
-  }, [load]);
+  }, [load, refresh]);
 
   const hasPending = orders.some((o) => o.status === 'pending');
   useEffect(() => {
@@ -45,6 +53,9 @@ export function OrdersScreen({ onCatalog }: { onCatalog: () => void }) {
   );
   const payable = items.length > 0 && items.every((s) => s.priceFrom != null);
   const total = items.reduce((a, s) => a + (s.priceFrom ?? 0), 0);
+  const promo = me?.activePromo;
+  const disc = payable && promo ? calcDiscount(total, promo.percent) : 0;
+  const toPay = total - disc;
 
   const pay = async () => {
     haptic('medium');
@@ -54,6 +65,7 @@ export function OrdersScreen({ onCatalog }: { onCatalog: () => void }) {
       clear();
       setComment('');
       load();
+      refresh();
       openLink(r.payUrl);
     } catch {
       toast('Не удалось создать оплату. Попробуйте позже', 'error');
@@ -64,7 +76,8 @@ export function OrdersScreen({ onCatalog }: { onCatalog: () => void }) {
 
   const toManager = () => {
     haptic('medium');
-    const text = 'Здравствуйте! Хочу заказать:\n' + items.map((s, i) => `${i + 1}. ${s.title}`).join('\n') + (comment ? '\n' + comment : '');
+    const text =
+      'Здравствуйте! Хочу заказать:\n' + items.map((s, i) => `${i + 1}. ${s.title}`).join('\n') + (comment ? '\n' + comment : '');
     openLink(`${BRAND.managerUrl}?text=${encodeURIComponent(text)}`);
   };
 
@@ -114,15 +127,27 @@ export function OrdersScreen({ onCatalog }: { onCatalog: () => void }) {
             </div>
           ))}
           <textarea className="cmt" placeholder="Комментарий к заказу (необязательно)" maxLength={500} value={comment} onChange={(e) => setComment(e.target.value)} />
+
           {payable && (
-            <div className="ord-total">
-              <span>Итого</span>
-              <span>{rub(total)}</span>
-            </div>
+            <>
+              {promo && (
+                <div className="ord-total" style={{ fontWeight: 600, fontSize: 14 }}>
+                  <span>
+                    Промокод {promo.code} (−{promo.percent}%)
+                  </span>
+                  <span>{disc ? '−' + rub(disc) : `от ${rub(ECONOMY.minOrder)}`}</span>
+                </div>
+              )}
+              <div className="ord-total">
+                <span>Итого</span>
+                <span>{rub(toPay)}</span>
+              </div>
+            </>
           )}
+
           {payable ? (
             <Button block className="svc-btn" disabled={busy} onClick={pay}>
-              {busy ? 'Создаём оплату…' : `Оплатить ${rub(total)}`}
+              {busy ? 'Создаём оплату…' : `Оплатить ${rub(toPay)}`}
             </Button>
           ) : (
             <Button block className="svc-btn" onClick={toManager}>
@@ -160,6 +185,11 @@ export function OrdersScreen({ onCatalog }: { onCatalog: () => void }) {
                   <li key={i.id}>{i.title}</li>
                 ))}
               </ul>
+              {o.discount > 0 && (
+                <div className="muted" style={{ margin: 0 }}>
+                  Скидка по промокоду {o.promo}: −{rub(o.discount)}
+                </div>
+              )}
               <div className="ord-sum">{rub(o.amount)}</div>
               {o.status === 'paid' && (
                 <div className="ord-head">
