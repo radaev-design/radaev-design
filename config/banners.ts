@@ -1,4 +1,5 @@
-// Баннеры главной. discount: '' -> цифра скидки скрыта. story: true -> баннер-история.
+// Баннеры главной. image: путь в public/ (PNG с прозрачным фоном), стоит справа.
+// story: true -> баннер-история (before/after). discount: '' -> цифра скидки скрыта.
 import type { CategoryId } from './catalog';
 
 export interface Banner {
@@ -11,8 +12,10 @@ export interface Banner {
   category: CategoryId;
   from: string;
   to: string;
+  image?: string;
   story?: boolean;
-  quote?: string;
+  before?: string;
+  after?: string;
   author?: string;
   isExample?: boolean;
 }
@@ -20,8 +23,10 @@ export interface Banner {
 export const BANNERS: Banner[] = [
   { id: 'first-order', tag: 'Скидка на первый заказ', title: 'Логотип и фирменный стиль', text: 'Новым клиентам — приятный бонус на первый заказ.', discount: '', cta: 'Заказать дизайн', category: 'design', from: '#ff0055', to: '#0d0303' },
   {
-    id: 'ai-story', tag: 'История клиента', title: 'Нейро-фотосессия', text: '', cta: 'Заказать нейро-фотосессию', category: 'ai-photo', from: '#7a0030', to: '#0d0303', story: true,
-    quote: 'Загрузила несколько обычных фото, а получила целую серию кадров как со студийной съёмки. Теперь это мои аватарки и контент для соцсетей!',
+    id: 'ai-story', tag: 'История клиента', title: 'Нейро-фотосессия', text: '', cta: 'Хочу так же', category: 'ai-photo',
+    from: '#7a0030', to: '#0d0303', story: true, image: 'banners/ai-girl.png',
+    before: 'Нужны были фото для товара, а студия — дорого и долго.',
+    after: 'Серия студийных кадров за один день. Клиентка осталась довольна.',
     author: 'Анна, клиентка', isExample: true,
   },
   { id: 'reels', tag: 'Акция', title: 'Монтаж Reels и Shorts', text: 'Динамичный монтаж, который удерживает внимание.', discount: '', cta: 'Заказать монтаж', category: 'video', from: '#ff3d7f', to: '#5c0a2a' },
