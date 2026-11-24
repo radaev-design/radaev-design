@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { BANNERS } from '../../../config/banners';
 import type { CategoryId } from '../../../config/catalog';
 import { haptic } from '../../integrations/telegram';
+import { asset } from '../../ui/utils';
 
 const INTERVAL = 5000;
 
@@ -50,21 +51,23 @@ export function Banners({ onOpen }: { onOpen: (cat?: CategoryId) => void }) {
       <div className="bn-track" ref={ref} onScroll={onScroll} onTouchStart={pause} onTouchEnd={resume} onMouseEnter={pause} onMouseLeave={resume}>
         {BANNERS.map((b) => (
           <div className="bn-slide" key={b.id}>
-            <div className="bn-card" style={{ background: `linear-gradient(135deg, ${b.from}, ${b.to})` }}>
+            <div className={'bn-card' + (b.story ? ' story' : '')} style={{ background: `linear-gradient(135deg, ${b.from}, ${b.to})` }}>
               <i className="bn-bubble" />
+              {b.image && <img className="bn-img" src={asset(b.image)} alt="" onError={(e) => (e.currentTarget.style.display = 'none')} />}
               <span className="bn-tag">{b.tag}</span>
               {b.story ? (
-                <div className="bn-story">
-                  <div className="bn-photos" aria-hidden="true">
-                    <div className="bn-ph">до</div>
-                    <div className="bn-ph after">после</div>
-                  </div>
-                  <div>
-                    <p className="bn-quote">«{b.quote}»</p>
-                    <div className="bn-author">
-                      {b.author}
-                      {b.isExample && <em> · пример отзыва</em>}
-                    </div>
+                <div className="bn-tale">
+                  <p>
+                    <b>Было:</b>
+                    {b.before}
+                  </p>
+                  <p>
+                    <b>Стало:</b>
+                    {b.after}
+                  </p>
+                  <div className="bn-author">
+                    {b.author}
+                    {b.isExample && <em> · пример</em>}
                   </div>
                 </div>
               ) : (
