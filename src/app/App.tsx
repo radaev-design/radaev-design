@@ -42,7 +42,7 @@ function Shell() {
     const t = setTimeout(() => {
       setSplash(false);
       if (!read(TOUR_KEY, false) && startParam() !== 'orders') setStep(0);
-    }, 2000);
+    }, 5000);
     return () => clearTimeout(t);
   }, []);
 
