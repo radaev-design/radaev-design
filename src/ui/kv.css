@@ -1,6 +1,6 @@
 /* Герой: геймпад */
-.hero { min-height: 360px; }
-.hobj.pad { filter: drop-shadow(0 0 22px rgba(255, 0, 85, 0.55)) drop-shadow(0 16px 14px rgba(0, 0, 0, 0.4)); }
+.hero { min-height: 370px; }
+.hobj.pad { filter: drop-shadow(0 0 18px rgba(255, 0, 85, 0.5)) drop-shadow(0 14px 12px rgba(0, 0, 0, 0.35)); }
 
 /* Бесконечная лента баннеров */
 .bn-track { scroll-snap-type: x mandatory; }
@@ -8,12 +8,18 @@
 
 /* KV-картинки в баннерах */
 .bn-card.has-kv { background-color: #0d0303; }
-.bn-card.has-kv::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, rgba(13, 3, 3, 0.85) 0, rgba(13, 3, 3, 0.5) 42%, transparent 68%); }
-.kv { position: absolute; right: 0; bottom: 0; z-index: 0; height: var(--kv-h, 84%); width: auto; max-width: none; pointer-events: none; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24%); mask-image: linear-gradient(90deg, transparent 0, #000 24%); }
+.bn-card.has-kv::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, rgba(13, 3, 3, 0.9) 0, rgba(13, 3, 3, 0.55) 40%, transparent 66%); }
+.kv {
+  position: absolute; right: -4%; bottom: 0; z-index: 0; height: var(--kv-h, 78%); width: auto; max-width: none; pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 26%), linear-gradient(180deg, transparent 0, #000 22%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(90deg, transparent 0, #000 26%), linear-gradient(180deg, transparent 0, #000 22%);
+  mask-composite: intersect;
+}
 .kv.blend { mix-blend-mode: screen; }
 .has-kv .bn-tag, .has-kv .bn-title, .has-kv .bn-text, .has-kv .bn-btn { position: relative; z-index: 2; }
-.has-kv .bn-title { max-width: 56%; font-size: 21px; }
-.has-kv .bn-text { max-width: 50%; font-size: 13px; }
+.has-kv .bn-title { max-width: 52%; font-size: 21px; }
+.has-kv .bn-text { max-width: 48%; font-size: 13px; }
 .has-kv .bn-bubble { display: none; }
 
 /* Диагональные ленты с логотипами */
