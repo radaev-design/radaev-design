@@ -1,0 +1,34 @@
+/* Герой: геймпад */
+.hero { min-height: 360px; }
+.hobj.pad { filter: drop-shadow(0 0 22px rgba(255, 0, 85, 0.55)) drop-shadow(0 16px 14px rgba(0, 0, 0, 0.4)); }
+
+/* Бесконечная лента баннеров */
+.bn-track { scroll-snap-type: x mandatory; }
+.bn-slide { scroll-snap-stop: always; }
+
+/* KV-картинки в баннерах */
+.bn-card.has-kv { background-color: #0d0303; }
+.bn-card.has-kv::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, rgba(13, 3, 3, 0.85) 0, rgba(13, 3, 3, 0.5) 42%, transparent 68%); }
+.kv { position: absolute; right: 0; bottom: 0; z-index: 0; height: var(--kv-h, 84%); width: auto; max-width: none; pointer-events: none; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24%); mask-image: linear-gradient(90deg, transparent 0, #000 24%); }
+.kv.blend { mix-blend-mode: screen; }
+.has-kv .bn-tag, .has-kv .bn-title, .has-kv .bn-text, .has-kv .bn-btn { position: relative; z-index: 2; }
+.has-kv .bn-title { max-width: 56%; font-size: 21px; }
+.has-kv .bn-text { max-width: 50%; font-size: 13px; }
+.has-kv .bn-bubble { display: none; }
+
+/* Диагональные ленты с логотипами */
+.rb-wrap { margin: 28px 0 8px; }
+.rb-title { margin: 0; font-family: var(--display); font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.rb-sub { margin: 4px 0 0; }
+.rb-view { overflow: hidden; margin: 0 -16px; padding: 44px 0 48px; }
+.rb-tilt { display: flex; flex-direction: column; gap: 10px; margin: 0 -25%; transform: rotate(-4deg); }
+.rb { overflow: hidden; padding: 16px 0; box-shadow: 0 12px 30px rgba(255, 0, 85, 0.25); }
+.rb.a { background: var(--blue); }
+.rb.b { background: #0d0303; border-block: 1px solid rgba(255, 0, 85, 0.6); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35); }
+.rb-track { display: flex; width: max-content; align-items: center; animation: rb-move linear infinite; }
+@keyframes rb-move { to { transform: translateX(-50%); } }
+.rb-item { flex: none; display: flex; align-items: center; gap: 28px; padding-right: 28px; }
+.rb-item img { height: 30px; width: auto; max-width: 120px; object-fit: contain; }
+.rb-star { font-style: normal; font-size: 16px; color: #0d0303; }
+.rb.b .rb-star { color: var(--accent); }
+.mono .rb-item img { filter: brightness(0) invert(1); }
