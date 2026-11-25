@@ -7,6 +7,7 @@ import { initTelegram } from './integrations/telegram';
 import './ui/theme.css';
 import './ui/brand.css';
 import './ui/extra.css';
+import './ui/kv.css';
 
 initTelegram();
 
