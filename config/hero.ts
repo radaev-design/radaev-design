@@ -12,7 +12,7 @@ export interface HeroObj {
 }
 
 export const HERO_OBJECTS: HeroObj[] = [
-  { src: 'hero/obj1.png', shape: 'sphere', w: 88, ratio: 1, top: 16, right: 10, delay: 0, dur: 5 },
-  { src: 'hero/obj2.png', shape: 'cube', w: 66, ratio: 1, top: 96, right: 6, delay: -1.8, dur: 6 },
-  { src: 'hero/gamepad.webp', shape: 'ring', w: 210, ratio: 1.5, top: 178, right: -18, delay: -3.4, dur: 5.5 },
+  { src: 'hero/obj1.png', shape: 'sphere', w: 84, ratio: 1, top: 14, right: 10, delay: 0, dur: 5 },
+  { src: 'hero/obj2.png', shape: 'cube', w: 58, ratio: 1, top: 112, right: 16, delay: -1.8, dur: 6 },
+  { src: 'hero/gamepad.webp', shape: 'ring', w: 210, ratio: 1.5, top: 186, right: -18, delay: -3.4, dur: 5.5 },
 ];
