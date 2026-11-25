@@ -1,20 +1,35 @@
-import { CLIENTS } from '../../config/clients';
+import { CLIENTS, CLIENTS_SUB, CLIENTS_TITLE, LOGO_MONO } from '../../config/clients';
 import { asset } from './utils';
+
+function Row({ items, cls, reverse }: { items: string[]; cls: string; reverse?: boolean }) {
+  const dur = Math.max(32, items.length * 6); // чем больше логотипов, тем дольше круг (медленно)
+  return (
+    <div className={'rb ' + cls}>
+      <div className="rb-track" style={{ animationDuration: dur + 's', animationDirection: reverse ? 'reverse' : 'normal' }}>
+        {[...items, ...items].map((f, i) => (
+          <span className="rb-item" key={i}>
+            <img src={asset('clients/' + f)} alt="" loading="lazy" onError={(e) => (e.currentTarget.style.display = 'none')} />
+            <i className="rb-star">✦</i>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export function Marquee() {
   if (!CLIENTS.length) return null;
-  const base = Array(Math.ceil(12 / CLIENTS.length)).fill(CLIENTS).flat() as string[];
-  const row = [...base, ...base];
+  const rep = Math.max(1, Math.ceil(8 / CLIENTS.length));
+  const a = Array(rep).fill(CLIENTS).flat() as string[];
+  const b = [...a].reverse();
   return (
-    <section className="mq" aria-label="С кем мы работали">
-      <h2>С кем мы работали</h2>
-      <div className="mq-view">
-        <div className="mq-track" style={{ animationDuration: Math.max(24, base.length * 3) + 's' }}>
-          {row.map((f, i) => (
-            <span className="mq-item" key={i}>
-              <img src={asset('clients/' + f)} alt="" loading="lazy" />
-            </span>
-          ))}
+    <section className={'rb-wrap' + (LOGO_MONO ? ' mono' : '')} aria-label={CLIENTS_TITLE}>
+      <h2 className="rb-title">{CLIENTS_TITLE}</h2>
+      <p className="muted rb-sub">{CLIENTS_SUB}</p>
+      <div className="rb-view">
+        <div className="rb-tilt">
+          <Row items={a} cls="a" />
+          <Row items={b} cls="b" reverse />
         </div>
       </div>
     </section>
